@@ -518,13 +518,13 @@
             // fileContextMenu
             // 
             this.fileContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tsmSelectAllFiles,
-            this.toolStripSeparator7,
             this.tsmCheckSelectedFiles,
-            this.tsmUncheckSelectedFiles});
+            this.tsmUncheckSelectedFiles,
+            this.toolStripSeparator7,
+            this.tsmSelectAllFiles});
             this.fileContextMenu.Name = "fileContextMenu";
             this.fileContextMenu.ShowItemToolTips = false;
-            this.fileContextMenu.Size = new System.Drawing.Size(194, 76);
+            this.fileContextMenu.Size = new System.Drawing.Size(194, 98);
             // 
             // tsmSelectAllFiles
             // 

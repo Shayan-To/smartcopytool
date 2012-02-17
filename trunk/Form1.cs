@@ -1444,6 +1444,11 @@ namespace SmartCopyTool
                 myProgress = null;                
             }
 
+            if ( e.Error != null )
+            {
+                MessageBox.Show( e.Error.Message );
+            }
+
             myStatusBar.SetCurrentOperation( null, null );
             statusMenu.Visible = false;
             myWorker = null;

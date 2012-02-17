@@ -159,6 +159,24 @@ namespace SmartCopyTool
             }
         }
 
+        // Get path relative to root
+        protected string GetRelativePath( string path, string root )
+        {
+            string relative = path.Substring( root.Length );
+            if ( relative.Length > 1 && relative[ 0 ] == Path.DirectorySeparatorChar )
+            {
+                relative = relative.Substring( 1 );
+            }
+            return relative;
+        }
+
+        // Re-root a path - i.e. get the path relative to dst instead of src
+        protected string RerootPath( string path, string src, string dst )
+        {
+            string targetName = Path.Combine( dst, GetRelativePath( path, src ) );
+            return targetName;
+        }
+
         // Indicate that a tree node should be removed
         protected void FlagForRemoval( TreeNode node )
         {
@@ -271,10 +289,9 @@ namespace SmartCopyTool
                     if ( CancellationPending )
                         return State.ABORTED;
 
-                    string relative = file.FullName.Substring( src.FullName.Length );
-                    string targetName = dst.FullName + relative;    // Path.Combine doesn't work because of the separator at the end ... concatenation should be safe?
+                    string targetName = RerootPath( file.FullName, src.FullName, dst.FullName );
 
-                    SetStatus( relative );
+                    SetStatus( GetRelativePath( file.FullName, src.FullName ) );
                     ReportProgress( ( ++count * 100 ) / total );
 
                     try
@@ -375,8 +392,7 @@ namespace SmartCopyTool
             Debug.Assert( folder.FullName.StartsWith( src.FullName ), "Walked into a folder that is not a subdirectory of root!" );
 
             // Get relative path
-            string relative = folder.FullName.Substring( src.FullName.Length );
-            string targetName = dst.FullName + relative;
+            string targetName = RerootPath( folder.FullName, src.FullName, dst.FullName );
             DirectoryInfo target = new DirectoryInfo( targetName );
 
             // Try to move entire folder subtree
@@ -449,8 +465,8 @@ namespace SmartCopyTool
                     if ( CancellationPending )
                         return State.ABORTED;
 
-                    string targetFilename = dst.FullName + file.FullName.Substring( src.FullName.Length );
-
+                    string targetFilename = RerootPath( file.FullName, src.FullName, dst.FullName );
+                   
                     try
                     {
                         if ( !File.Exists( targetFilename ) )
@@ -709,13 +725,12 @@ namespace SmartCopyTool
             FolderData directory = (FolderData)node.Tag;
             Debug.Assert( directory.FullName.StartsWith( src.FullName ), "Walked into a folder that is not a subdirectory of root!" );
 
-            string relative = directory.FullName.Substring( src.FullName.Length );
-            string targetName = dst.FullName + relative;    // Path.Combine doesn't work because of the separator at the end ... concatenation should be safe?
+            string targetName = RerootPath( directory.FullName, src.FullName, dst.FullName );
+
+            SetStatus( GetRelativePath( directory.FullName, src.FullName ) );
+            ReportProgress( ( ++numProcessed * 100 ) / numNodes );
 
             FolderData targetDirectory = new FolderData( targetName );
-
-            SetStatus( relative );
-            ReportProgress( ( ++numProcessed * 100 ) / numNodes );
 
             bool mirrored = true;
 
@@ -785,10 +800,9 @@ namespace SmartCopyTool
             FolderData directory = (FolderData)node.Tag;
             Debug.Assert( directory.FullName.StartsWith( src.FullName ), "Walked into a folder that is not a subdirectory of root!" );
 
-            string relative = directory.FullName.Substring( src.FullName.Length );
-            string targetName = dst.FullName + relative;    // Path.Combine doesn't work because of the separator at the end ... concatenation should be safe?
+            string targetName = RerootPath( directory.FullName, src.FullName, dst.FullName );
 
-            SetStatus( relative );
+            SetStatus( GetRelativePath( directory.FullName, src.FullName ) );
             ReportProgress( ( ++numProcessed * 100 ) / numNodes );
 
             bool unmirrored = true;
