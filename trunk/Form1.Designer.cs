@@ -47,16 +47,17 @@
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.menuRemoveMirrored = new System.Windows.Forms.ToolStripMenuItem();
             this.menuRemoveUnmirrored = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuSaveSelection = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuRestoreSelection = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuExpandSelectedFolders = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuDeleteFiles = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuFindOrphans = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuUpdateDirectory = new System.Windows.Forms.ToolStripMenuItem();
             this.menuSynchroniseDirectory = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMergeDirectories = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuSaveSelection = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuRestoreSelection = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuExpandSelectedFolders = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.menuExit = new System.Windows.Forms.ToolStripMenuItem();
             this.filtersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -78,10 +79,10 @@
             this.columnDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnNotes = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.fileContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.tsmSelectAllFiles = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmCheckSelectedFiles = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmUncheckSelectedFiles = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmSelectAllFiles = new System.Windows.Forms.ToolStripMenuItem();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.folderBrowserDialog2 = new System.Windows.Forms.FolderBrowserDialog();
@@ -180,16 +181,17 @@
             this.toolStripSeparator4,
             this.menuRemoveMirrored,
             this.menuRemoveUnmirrored,
-            this.toolStripSeparator1,
-            this.menuSaveSelection,
-            this.menuRestoreSelection,
-            this.menuExpandSelectedFolders,
             this.toolStripSeparator2,
             this.menuDeleteFiles,
             this.toolStripSeparator3,
             this.menuFindOrphans,
+            this.menuUpdateDirectory,
             this.menuSynchroniseDirectory,
             this.menuMergeDirectories,
+            this.toolStripSeparator1,
+            this.menuSaveSelection,
+            this.menuRestoreSelection,
+            this.menuExpandSelectedFolders,
             this.toolStripSeparator6,
             this.menuExit});
             this.fileMenu.Name = "fileMenu";
@@ -260,32 +262,6 @@
     "";
             this.menuRemoveUnmirrored.Click += new System.EventHandler(this.menuRemoveUnmirrored_Click);
             // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(229, 6);
-            // 
-            // menuSaveSelection
-            // 
-            this.menuSaveSelection.Name = "menuSaveSelection";
-            this.menuSaveSelection.Size = new System.Drawing.Size(232, 22);
-            this.menuSaveSelection.Text = "Save Selection To Text File";
-            this.menuSaveSelection.Click += new System.EventHandler(this.menuSaveSelection_Click);
-            // 
-            // menuRestoreSelection
-            // 
-            this.menuRestoreSelection.Name = "menuRestoreSelection";
-            this.menuRestoreSelection.Size = new System.Drawing.Size(232, 22);
-            this.menuRestoreSelection.Text = "Restore Selection From File";
-            this.menuRestoreSelection.Click += new System.EventHandler(this.menuRestoreSelection_Click);
-            // 
-            // menuExpandSelectedFolders
-            // 
-            this.menuExpandSelectedFolders.Name = "menuExpandSelectedFolders";
-            this.menuExpandSelectedFolders.Size = new System.Drawing.Size(232, 22);
-            this.menuExpandSelectedFolders.Text = "Expand Selected Folders";
-            this.menuExpandSelectedFolders.Click += new System.EventHandler(this.menuExpandSelectedFolders_Click);
-            // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
@@ -313,6 +289,15 @@
     "current directory.";
             this.menuFindOrphans.Click += new System.EventHandler(this.findOrphansToolStripMenuItem_Click);
             // 
+            // menuUpdateDirectory
+            // 
+            this.menuUpdateDirectory.Name = "menuUpdateDirectory";
+            this.menuUpdateDirectory.Size = new System.Drawing.Size(232, 22);
+            this.menuUpdateDirectory.Text = "Update Directory";
+            this.menuUpdateDirectory.ToolTipText = "Copy any files and folders in the source to the target if they are not already pr" +
+    "esent.";
+            this.menuUpdateDirectory.Click += new System.EventHandler(this.menuUpdateDirectory_Click);
+            // 
             // menuSynchroniseDirectory
             // 
             this.menuSynchroniseDirectory.Name = "menuSynchroniseDirectory";
@@ -330,6 +315,32 @@
             this.menuMergeDirectories.ToolTipText = "Merge this directory with another.  Any files not in either directory will be cop" +
     "ied to the other.";
             this.menuMergeDirectories.Click += new System.EventHandler(this.menuMergeDirectories_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(229, 6);
+            // 
+            // menuSaveSelection
+            // 
+            this.menuSaveSelection.Name = "menuSaveSelection";
+            this.menuSaveSelection.Size = new System.Drawing.Size(232, 22);
+            this.menuSaveSelection.Text = "Save Selection To Text File";
+            this.menuSaveSelection.Click += new System.EventHandler(this.menuSaveSelection_Click);
+            // 
+            // menuRestoreSelection
+            // 
+            this.menuRestoreSelection.Name = "menuRestoreSelection";
+            this.menuRestoreSelection.Size = new System.Drawing.Size(232, 22);
+            this.menuRestoreSelection.Text = "Restore Selection From File";
+            this.menuRestoreSelection.Click += new System.EventHandler(this.menuRestoreSelection_Click);
+            // 
+            // menuExpandSelectedFolders
+            // 
+            this.menuExpandSelectedFolders.Name = "menuExpandSelectedFolders";
+            this.menuExpandSelectedFolders.Size = new System.Drawing.Size(232, 22);
+            this.menuExpandSelectedFolders.Text = "Expand Selected Folders";
+            this.menuExpandSelectedFolders.Click += new System.EventHandler(this.menuExpandSelectedFolders_Click);
             // 
             // toolStripSeparator6
             // 
@@ -524,20 +535,7 @@
             this.tsmSelectAllFiles});
             this.fileContextMenu.Name = "fileContextMenu";
             this.fileContextMenu.ShowItemToolTips = false;
-            this.fileContextMenu.Size = new System.Drawing.Size(194, 98);
-            // 
-            // tsmSelectAllFiles
-            // 
-            this.tsmSelectAllFiles.Name = "tsmSelectAllFiles";
-            this.tsmSelectAllFiles.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-            this.tsmSelectAllFiles.Size = new System.Drawing.Size(193, 22);
-            this.tsmSelectAllFiles.Text = "Select All Files";
-            this.tsmSelectAllFiles.Click += new System.EventHandler(this.tsmSelectAllFiles_Click);
-            // 
-            // toolStripSeparator7
-            // 
-            this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(190, 6);
+            this.fileContextMenu.Size = new System.Drawing.Size(194, 76);
             // 
             // tsmCheckSelectedFiles
             // 
@@ -552,6 +550,19 @@
             this.tsmUncheckSelectedFiles.Size = new System.Drawing.Size(193, 22);
             this.tsmUncheckSelectedFiles.Text = "Uncheck Selected Files";
             this.tsmUncheckSelectedFiles.Click += new System.EventHandler(this.tsmUncheckSelectedFiles_Click);
+            // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(190, 6);
+            // 
+            // tsmSelectAllFiles
+            // 
+            this.tsmSelectAllFiles.Name = "tsmSelectAllFiles";
+            this.tsmSelectAllFiles.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
+            this.tsmSelectAllFiles.Size = new System.Drawing.Size(193, 22);
+            this.tsmSelectAllFiles.Text = "Select All Files";
+            this.tsmSelectAllFiles.Click += new System.EventHandler(this.tsmSelectAllFiles_Click);
             // 
             // textBox1
             // 
@@ -679,6 +690,7 @@
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.ToolStripMenuItem menuRestoreSelection;
         private System.Windows.Forms.ToolStripMenuItem menuExpandSelectedFolders;
+        private System.Windows.Forms.ToolStripMenuItem menuUpdateDirectory;
 
     }
 }

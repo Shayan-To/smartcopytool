@@ -32,7 +32,7 @@ namespace SmartCopyTool
     /// Base class to perform potentially long-running operations
     /// asynchronously, with progress reporting and potentially preemptive termination.
     /// </summary>
-    class Worker
+    abstract class Worker
     {
         public enum State { IDLE, ACTIVE, COMPLETED, ABORTED, ERROR };
 
@@ -132,11 +132,8 @@ namespace SmartCopyTool
             return GetState();
         }
 
-        protected virtual State DoWork()    // TODO: Abstract
-        {
-            myState = State.ERROR;
-            return State.ERROR;
-        }
+        // Subclasses should overload DoWork to do something
+        protected abstract State DoWork();
 
         // Log a warning to the buffer
         protected void LogWarning( string warning, params object[] args )
