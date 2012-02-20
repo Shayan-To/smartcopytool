@@ -648,6 +648,26 @@ namespace SmartCopyTool
         }
 
         /// <summary>
+        /// Update target directory... copy any files in the source that are not found in the target
+        /// </summary>
+        public void UpdateTargetDirectory()
+        {
+            DialogResult result = DialogResult.OK;
+
+            // Copy unmirrored files into target directory
+            result = RemoveMirroredPaths();
+
+            if ( result == DialogResult.OK && directoryTree.Nodes.Count > 0 )
+            {
+                // Select the whole tree... selective synchronisation is complicated by the need
+                // to delete files which weren't just not there in source, but were not selected...
+                directoryTree.Nodes[ 0 ].Checked = true;
+
+                result = CopySelectedFolders( false );
+            }
+        }
+
+        /// <summary>
         /// Merge two directories... copy any files not in one into the other.
         /// </summary>
         public void MergeDirectories()
@@ -952,6 +972,26 @@ namespace SmartCopyTool
                 FindOrphansInTarget();
             }
         }
+
+        /// <summary>
+        /// One-shot operation to copy any missing files/folders from the Source to the Target
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void menuUpdateDirectory_Click( object sender, EventArgs e )
+        {
+            folderBrowserDialog2.SelectedPath = myOptions.targetPath;
+
+            if ( folderBrowserDialog2.ShowDialog() == DialogResult.OK )
+            {
+                myOptions.targetPath = folderBrowserDialog2.SelectedPath;
+
+                UpdateTargetDirectory();
+            }
+
+        }
+
+
 
         /// <summary>
         /// One-shot operation to synchronise a directory with the current directory.  Substeps are:
