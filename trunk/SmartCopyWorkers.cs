@@ -498,7 +498,7 @@ namespace SmartCopyTool
 
                 if ( folder.GetSelectedFiles( options ) == null || folder.GetSelectedFiles( options ).Count == 0 )
                 {
-                    SetStatus( "Removing {0}", folder.FullName );
+                    SetStatus( "Filtering {0}", folder.FullName );
                     ReportProgress( ( ++numMoved * 100 ) / numNodesToMove );
 
                     try
@@ -671,8 +671,8 @@ namespace SmartCopyTool
         public MirrorRemover( TreeView tree, Options options, RemoveType operation = RemoveType.MIRRORED )
             : base()
         {
-            operationName = ( operation == RemoveType.MIRRORED ) ? "Removing Mirrored Paths" : "Removing Unmirrored Paths";
-            operationText = String.Format( "Removing {0} files and folders from {1}", ( operation == RemoveType.MIRRORED ) ? "mirrored" : "unmirroed", options.sourcePath );
+            operationName = (operation == RemoveType.MIRRORED) ? "Filtering Mirrored Paths" : "Filtering Unmirrored Paths";
+            operationText = String.Format("Filtering out {0} files and folders from {1}", (operation == RemoveType.MIRRORED) ? "mirrored" : "unmirrored", options.sourcePath);
             canCancel = true;
             canPause = true;
             this.tree = tree;
@@ -864,6 +864,135 @@ namespace SmartCopyTool
 
     }   // End of MirrorRemover
 
+    /// <summary>
+    /// Filter files based on date/time
+    /// </summary>
+    class DateRemover : Worker
+    {
+        TreeView tree;
+        Options options;
+
+        private int numNodes = 0;
+        private int numProcessed = 0;
+
+        DateTime? FilterIfOlderThan { get; set; }
+        DateTime? FilterIfNewerThan { get; set; }
+
+        public DateRemover(TreeView tree, Options options, DateTime? dtFilterIfOlderThan, DateTime? dtFilterIfNewerThan)
+        {
+            operationName = "Filtering by date";
+            operationText = String.Format("Filtering files older than {0} or newer than {1}",
+                dtFilterIfOlderThan != null ? dtFilterIfOlderThan.ToString() : "any",
+                dtFilterIfNewerThan != null ? dtFilterIfNewerThan.ToString() : "any");
+            canCancel = true;
+            canPause = true;
+            this.tree = tree;
+            this.options = options;
+
+            FilterIfOlderThan = dtFilterIfOlderThan;
+            FilterIfNewerThan = dtFilterIfNewerThan;
+        }
+
+        protected override State DoWork()
+        {
+            numNodes = tree.GetNodeCount(true);
+            numProcessed = 0;
+
+            DirectoryInfo src = new DirectoryInfo(options.sourcePath);
+            Debug.Assert(src != null);
+
+            // Anything to filter?
+            if (FilterIfOlderThan.HasValue == false && FilterIfNewerThan.HasValue == false)
+            {
+                return State.ERROR;
+            }
+
+            if (numNodes == 0)
+                return State.COMPLETED;
+
+            RemoveIfBetweenDates(tree.Nodes[0], src);
+
+            return State.COMPLETED;
+        }
+
+        /// <summary>
+        /// Recursively remove files and folders if creation time not between two dates
+        /// </summary>
+        /// <returns>true if all files/folders removed</returns>
+        private bool RemoveIfBetweenDates(TreeNode node, DirectoryInfo src)
+        {
+            if (PauseRequested)
+                DoPause();
+
+            if (CancellationPending)
+                return false;
+
+            FolderData directory = (FolderData)node.Tag;
+            Debug.Assert(directory.FullName.StartsWith(src.FullName), "Walked into a folder that is not a subdirectory of root!");
+
+            SetStatus(GetRelativePath(directory.FullName, src.FullName));
+            ReportProgress((++numProcessed * 100) / numNodes);
+
+            bool removed = true;
+
+            // First try and remove all children
+            // Cache the next node so we don't get an iteration fail when we remove a node
+            if (node.Nodes.Count > 0)
+            {
+                TreeNode next = null;
+                for (TreeNode child = node.Nodes[0]; child != null; child = next)
+                {
+                    next = child.NextNode;
+                    if (false == RemoveIfBetweenDates(child, src))
+                    {
+                        removed = false;
+                    }
+                }
+            }
+
+            if (removed)
+            {
+                // update the file's flags
+                directory.GetSelectedFiles(options);
+            }
+
+            // Remove any files not between the given dates
+            foreach (FileData file in directory.GetFiles())
+            {
+                if (PauseRequested)
+                    DoPause();
+
+                if (CancellationPending)
+                    return false;
+
+                if (FilterIfOlderThan.HasValue && file.CreationTime.Date < FilterIfOlderThan.Value)
+                {
+                    file.Removed = true;
+                    file.Notes = String.Format("Older than {0}", FilterIfOlderThan.Value);
+                }
+                else if (FilterIfNewerThan.HasValue && file.CreationTime.Date > FilterIfNewerThan.Value)
+                {
+                    file.Removed = true;
+                    file.Notes = String.Format("Newer than {0}", FilterIfNewerThan.Value);
+                }
+                else if (!file.Filtered && !file.Removed)
+                {
+                    removed = false;
+                }
+            }
+
+            // If no subdirectories or files left, remove it
+            if (removed)
+            {
+                FlagForRemoval(node);
+            }
+
+            return removed;
+        }
+
+
+
+    } // END of DateRemover
 
     /// <summary>
     /// Build directory tree asynchronously
@@ -941,12 +1070,13 @@ namespace SmartCopyTool
         /// <returns></returns>
         private static TreeNodeCollection AddFolderToTree( TreeNodeCollection parent, DirectoryInfo path, Options options )
         {
-            TreeNode node = parent.Add( path.Name );
+            TreeNode node = new TreeNode( path.Name );
             node.Tag = new FolderData( path );
             if ( node.Parent == null )
             {
                 node.Expand();
             }
+            parent.Add(node);
             return node.Nodes;
         }
 
@@ -1173,7 +1303,7 @@ namespace SmartCopyTool
 
             foreach ( FileData file in folder.GetFiles() )
             {
-                if ( Array.BinarySearch( files, file.FullName ) >= 0 )
+                if ( Array.BinarySearch( files, file.FullName, StringComparer.InvariantCultureIgnoreCase ) >= 0 )
                 {
                     file.Checked = true;
                     ReportProgress( ( ++numSelected * 100 ) / ( numNodesToSelect + numFilesToSelect ) );
@@ -1187,7 +1317,7 @@ namespace SmartCopyTool
             // If the file contained extended NODE tags, restore them
             if ( nodes != null && nodes.Length > 0 )
             {
-                if ( Array.BinarySearch( nodes, folder.FullName ) >= 0 )
+                if ( Array.BinarySearch( nodes, folder.FullName, StringComparer.InvariantCultureIgnoreCase ) >= 0 )
                 {
                     SelectNode( node );
                     ReportProgress( ( ++numSelected * 100 ) / ( numNodesToSelect + numFilesToSelect ) );

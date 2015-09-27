@@ -155,6 +155,11 @@ namespace SmartCopyTool
                     substring += " (Ignore Size)";
                 }
 
+                if (options.ignoreExtension == true)
+                {
+                    substring += " (Ignore Extension)";
+                }
+
                 if ( options.allowOverwrite == true )
                 {
                     substring += " (Allow Overwrite)";
@@ -203,6 +208,7 @@ namespace SmartCopyTool
                          parentOptions.Filters != statusBarOptions.Filters ||
                          parentOptions.sourcePath != statusBarOptions.sourcePath ||
                          parentOptions.ignoreSize != statusBarOptions.ignoreSize ||
+                         parentOptions.ignoreExtension != statusBarOptions.ignoreExtension ||
                          parentOptions.allowOverwrite != statusBarOptions.allowOverwrite )
                     {
                         statusBarOptions = new Options( parentOptions );

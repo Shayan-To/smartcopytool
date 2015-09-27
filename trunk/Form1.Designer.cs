@@ -47,6 +47,7 @@
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.menuRemoveMirrored = new System.Windows.Forms.ToolStripMenuItem();
             this.menuRemoveUnmirrored = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuFilterByDate = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuDeleteFiles = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
@@ -88,6 +89,7 @@
             this.folderBrowserDialog2 = new System.Windows.Forms.FolderBrowserDialog();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.menuIgnoreExtension = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -181,6 +183,7 @@
             this.toolStripSeparator4,
             this.menuRemoveMirrored,
             this.menuRemoveUnmirrored,
+            this.menuFilterByDate,
             this.toolStripSeparator2,
             this.menuDeleteFiles,
             this.toolStripSeparator3,
@@ -249,18 +252,25 @@
             // 
             this.menuRemoveMirrored.Name = "menuRemoveMirrored";
             this.menuRemoveMirrored.Size = new System.Drawing.Size(232, 22);
-            this.menuRemoveMirrored.Text = "Remove Mirrored Paths";
+            this.menuRemoveMirrored.Text = "Filter Mirrored Paths";
             this.menuRemoveMirrored.ToolTipText = "Remove files and folders from the list if they exist in a target directory";
-            this.menuRemoveMirrored.Click += new System.EventHandler(this.menuRemoveMirrored_Click);
+            this.menuRemoveMirrored.Click += new System.EventHandler(this.menuFilterMirrored_Click);
             // 
             // menuRemoveUnmirrored
             // 
             this.menuRemoveUnmirrored.Name = "menuRemoveUnmirrored";
             this.menuRemoveUnmirrored.Size = new System.Drawing.Size(232, 22);
-            this.menuRemoveUnmirrored.Text = "Remove Unmirrored Paths";
+            this.menuRemoveUnmirrored.Text = "Filter Unmirrored Paths";
             this.menuRemoveUnmirrored.ToolTipText = "Remove files and folders from the list if they do not exist in a target directory" +
     "";
-            this.menuRemoveUnmirrored.Click += new System.EventHandler(this.menuRemoveUnmirrored_Click);
+            this.menuRemoveUnmirrored.Click += new System.EventHandler(this.menuFilterUnmirrored_Click);
+            // 
+            // menuFilterByDate
+            // 
+            this.menuFilterByDate.Name = "menuFilterByDate";
+            this.menuFilterByDate.Size = new System.Drawing.Size(232, 22);
+            this.menuFilterByDate.Text = "Filter By Date";
+            this.menuFilterByDate.Click += new System.EventHandler(this.menuFilterByDate_Click);
             // 
             // toolStripSeparator2
             // 
@@ -364,6 +374,7 @@
             this.toolStripSeparator5,
             this.menuIncludeHidden,
             this.menuIgnoreSize,
+            this.menuIgnoreExtension,
             this.menuAllowOverwrite});
             this.filtersToolStripMenuItem.Name = "filtersToolStripMenuItem";
             this.filtersToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
@@ -372,35 +383,35 @@
             // menuSetFilters
             // 
             this.menuSetFilters.Name = "menuSetFilters";
-            this.menuSetFilters.Size = new System.Drawing.Size(181, 22);
-            this.menuSetFilters.Text = "Set Filters";
+            this.menuSetFilters.Size = new System.Drawing.Size(186, 22);
+            this.menuSetFilters.Text = "Set Filename Filters";
             this.menuSetFilters.Click += new System.EventHandler(this.menuSetFilters_Click);
             // 
             // menuClearFilters
             // 
             this.menuClearFilters.Name = "menuClearFilters";
-            this.menuClearFilters.Size = new System.Drawing.Size(181, 22);
-            this.menuClearFilters.Text = "Clear Filters";
+            this.menuClearFilters.Size = new System.Drawing.Size(186, 22);
+            this.menuClearFilters.Text = "Clear Filename Filters";
             this.menuClearFilters.Click += new System.EventHandler(this.menuClearFilters_Click);
             // 
             // menuShowFilteredFiles
             // 
             this.menuShowFilteredFiles.CheckOnClick = true;
             this.menuShowFilteredFiles.Name = "menuShowFilteredFiles";
-            this.menuShowFilteredFiles.Size = new System.Drawing.Size(181, 22);
+            this.menuShowFilteredFiles.Size = new System.Drawing.Size(186, 22);
             this.menuShowFilteredFiles.Text = "Show Filtered Files";
             this.menuShowFilteredFiles.CheckedChanged += new System.EventHandler(this.menuShowFilteredFiles_CheckedChanged);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(178, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(183, 6);
             // 
             // menuIncludeHidden
             // 
             this.menuIncludeHidden.CheckOnClick = true;
             this.menuIncludeHidden.Name = "menuIncludeHidden";
-            this.menuIncludeHidden.Size = new System.Drawing.Size(181, 22);
+            this.menuIncludeHidden.Size = new System.Drawing.Size(186, 22);
             this.menuIncludeHidden.Text = "Include Hidden Files";
             this.menuIncludeHidden.ToolTipText = "Include hidden files in copy/move/compare operations";
             this.menuIncludeHidden.CheckedChanged += new System.EventHandler(this.menuIncludeHidden_CheckedChanged);
@@ -409,7 +420,7 @@
             // 
             this.menuIgnoreSize.CheckOnClick = true;
             this.menuIgnoreSize.Name = "menuIgnoreSize";
-            this.menuIgnoreSize.Size = new System.Drawing.Size(181, 22);
+            this.menuIgnoreSize.Size = new System.Drawing.Size(186, 22);
             this.menuIgnoreSize.Text = "Ignore Size";
             this.menuIgnoreSize.ToolTipText = "Ignore file sizes when checking for mirrored or unmirrored files and folders";
             this.menuIgnoreSize.CheckedChanged += new System.EventHandler(this.menuIgnoreSize_CheckedChanged);
@@ -418,7 +429,7 @@
             // 
             this.menuAllowOverwrite.CheckOnClick = true;
             this.menuAllowOverwrite.Name = "menuAllowOverwrite";
-            this.menuAllowOverwrite.Size = new System.Drawing.Size(181, 22);
+            this.menuAllowOverwrite.Size = new System.Drawing.Size(186, 22);
             this.menuAllowOverwrite.Text = "Allow Overwrite";
             this.menuAllowOverwrite.ToolTipText = "Overwrite files in destination when  copying or moving";
             this.menuAllowOverwrite.CheckedChanged += new System.EventHandler(this.menuAllowOverwrite_CheckedChanged);
@@ -600,6 +611,15 @@
             this.openFileDialog.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
             this.openFileDialog.Title = "Choose Filename";
             // 
+            // menuIgnoreExtension
+            // 
+            this.menuIgnoreExtension.CheckOnClick = true;
+            this.menuIgnoreExtension.Name = "menuIgnoreExtension";
+            this.menuIgnoreExtension.Size = new System.Drawing.Size(186, 22);
+            this.menuIgnoreExtension.Text = "Ignore Extension";
+            this.menuIgnoreExtension.ToolTipText = "Ignore file extensions when checked";
+            this.menuIgnoreExtension.CheckedChanged += new System.EventHandler(this.menuIgnoreExtension_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -691,6 +711,8 @@
         private System.Windows.Forms.ToolStripMenuItem menuRestoreSelection;
         private System.Windows.Forms.ToolStripMenuItem menuExpandSelectedFolders;
         private System.Windows.Forms.ToolStripMenuItem menuUpdateDirectory;
+        private System.Windows.Forms.ToolStripMenuItem menuFilterByDate;
+        private System.Windows.Forms.ToolStripMenuItem menuIgnoreExtension;
 
     }
 }

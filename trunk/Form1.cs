@@ -96,6 +96,7 @@ namespace SmartCopyTool
                 myOptions = new Options();
                 myOptions.includeHidden = menuIncludeHidden.Checked;
                 myOptions.ignoreSize = menuIgnoreSize.Checked;
+                myOptions.ignoreExtension = menuIgnoreExtension.Checked;
                 myOptions.allowOverwrite = menuAllowOverwrite.Checked;
                 myOptions.showFilteredFiles = menuShowFilteredFiles.Checked;
                 myOptions.windowSize = this.Size;
@@ -113,6 +114,7 @@ namespace SmartCopyTool
             // Restore other options
             menuIncludeHidden.Checked = myOptions.includeHidden;
             menuIgnoreSize.Checked = myOptions.ignoreSize;
+            menuIgnoreExtension.Checked = myOptions.ignoreExtension;
             menuAllowOverwrite.Checked = myOptions.allowOverwrite;
             menuShowFilteredFiles.Checked = myOptions.showFilteredFiles;
             if ( myOptions.columnSizes != null && myOptions.columnSizes.Count() == fileListView.Columns.Count )
@@ -855,6 +857,16 @@ namespace SmartCopyTool
         }
 
         /// <summary>
+        /// State of Ignore Extension menu option changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void menuIgnoreExtension_CheckedChanged(object sender, EventArgs e)
+        {
+            myOptions.ignoreExtension = menuIgnoreExtension.Checked;
+        }
+
+        /// <summary>
         /// State of 'Allow Overwrite' menu option changed
         /// </summary>
         /// <param name="sender"></param>
@@ -883,7 +895,7 @@ namespace SmartCopyTool
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void menuRemoveMirrored_Click( object sender, EventArgs e )
+        private void menuFilterMirrored_Click( object sender, EventArgs e )
         {
             folderBrowserDialog2.SelectedPath = myOptions.targetPath;
 
@@ -899,7 +911,7 @@ namespace SmartCopyTool
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void menuRemoveUnmirrored_Click( object sender, EventArgs e )
+        private void menuFilterUnmirrored_Click( object sender, EventArgs e )
         {
             folderBrowserDialog2.SelectedPath = myOptions.targetPath;
 
@@ -909,6 +921,57 @@ namespace SmartCopyTool
                 RemoveUnmirroredPaths( true );
             }
         }
+
+        /// <summary>
+        /// Set date filters
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void menuFilterByDate_Click(object sender, EventArgs e)
+        {
+            using (FormDateFilters formDateFilters = new FormDateFilters(myOptions.FilterIfOlder, myOptions.FilterIfNewer))
+            {
+                if (formDateFilters.ShowDialog() == DialogResult.OK)
+                {
+                    myOptions.FilterIfOlder = formDateFilters.FilterIfOlder;
+                    myOptions.FilterIfNewer = formDateFilters.FilterIfNewer;
+
+                    if (myOptions.FilterIfOlder.HasValue == false && myOptions.FilterIfNewer.HasValue == false)
+                    {
+                        MessageBox.Show("No date filters selected, nothing to filter!", "Cannot comply", MessageBoxButtons.OK);
+                        return;
+                    }
+
+                    bool bRunInBackground = false;
+                    DateRemover myDateRemover = new DateRemover(directoryTree, myOptions, myOptions.FilterIfOlder, myOptions.FilterIfNewer);
+                    if (bRunInBackground)
+                    {
+                        PerformBackgroundOperation(myDateRemover);
+                        AddOperationEndHandler(bw_EventHandlerExpandRoot);
+                    }
+                    else
+                    {
+                        PerformLongOperation(myDateRemover);
+
+                        if (directoryTree.Nodes.Count > 0)
+                        {
+                            DisplayFolderContents(directoryTree.SelectedNode);
+                            myStatusBar.ScanRequest = true;
+                        }
+                        else
+                        {
+                            myLog.Write("No files or folders between the unfiltered date range!");
+                            // Never really want to remove the root, do we?
+                            // Reference counting to the rescue!
+                            //directoryTree.Nodes.Add( root );
+                            //directoryTree.SelectedNode = directoryTree.Nodes[ 0 ];
+                        }
+                    }
+                }
+            }
+        }
+
+
 
 
         /// <summary>
@@ -1143,22 +1206,24 @@ namespace SmartCopyTool
         /// <param name="e"></param>
         private void menuSetFilters_Click( object sender, EventArgs e )
         {
-            FormSetFilters dialog = new FormSetFilters();
-            dialog.filterString = myOptions.Filters;
-
-            if ( dialog.ShowDialog() == DialogResult.OK )
+            using (FormSetFilters dialog = new FormSetFilters())
             {
-                myOptions.Filters = dialog.filterString;
-                myLog.Write( "Set filters to [{0}]", myOptions.Filters );
+                dialog.filterString = myOptions.Filters;
 
-                if ( directoryTree.Nodes.Count > 0 )
+                if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    if ( directoryTree.SelectedNode == null )
-                        directoryTree.SelectedNode = directoryTree.Nodes[ 0 ];
-                    DisplayFolderContents( directoryTree.SelectedNode );
-                }
+                    myOptions.Filters = dialog.filterString;
+                    myLog.Write("Set filters to [{0}]", myOptions.Filters);
 
-                myStatusBar.ScanRequest = true;
+                    if (directoryTree.Nodes.Count > 0)
+                    {
+                        if (directoryTree.SelectedNode == null)
+                            directoryTree.SelectedNode = directoryTree.Nodes[0];
+                        DisplayFolderContents(directoryTree.SelectedNode);
+                    }
+
+                    myStatusBar.ScanRequest = true;
+                }
             }
         }
 
@@ -1326,28 +1391,30 @@ namespace SmartCopyTool
 
             backgroundWorker1.RunWorkerAsync( worker );
 
-            myProgress = new FormProgressDialog( worker );
-            myProgress.Text = worker.operationName;
-            myProgress.label1.Text = worker.operationText;
-            myProgress.label2.Text = "";
-            myProgress.progressBar1.Value = 0;
-            myProgress.cancelButton.Enabled = ( worker.canCancel );
-            myProgress.pauseButton.Enabled = ( worker.canPause );
-            DialogResult result = myProgress.ShowDialog();
-
-            if ( result == DialogResult.Cancel )
+            using (myProgress = new FormProgressDialog(worker))
             {
-                if ( backgroundWorker1.IsBusy )
-                {
-                    // Don't allow any other ops to be started until worker has really cancelled
-                    myLog.Write( "Cancelling {0}... please wait.", worker.operationName );
-                    menuStrip1.Enabled = false; 
-                    AddOperationEndHandler( bw_EventHandlerEnableMenus );
-                    backgroundWorker1.CancelAsync();
-                }
-            }
+                myProgress.Text = worker.operationName;
+                myProgress.label1.Text = worker.operationText;
+                myProgress.label2.Text = "";
+                myProgress.progressBar1.Value = 0;
+                myProgress.cancelButton.Enabled = (worker.canCancel);
+                myProgress.pauseButton.Enabled = (worker.canPause);
+                DialogResult result = myProgress.ShowDialog();
 
-            return result;
+                if (result == DialogResult.Cancel)
+                {
+                    if (backgroundWorker1.IsBusy)
+                    {
+                        // Don't allow any other ops to be started until worker has really cancelled
+                        myLog.Write("Cancelling {0}... please wait.", worker.operationName);
+                        menuStrip1.Enabled = false;
+                        AddOperationEndHandler(bw_EventHandlerEnableMenus);
+                        backgroundWorker1.CancelAsync();
+                    }
+                }
+
+                return result;
+            }
         }
 
         /// <summary>
@@ -1647,6 +1714,7 @@ namespace SmartCopyTool
             }
         }
 
+
     }
 
     /// <summary>
@@ -1727,6 +1795,7 @@ namespace SmartCopyTool
         public string targetPath = "";
         public bool includeHidden = false;
         public bool ignoreSize = false;
+        public bool ignoreExtension = false;
         public bool allowOverwrite = false;
         public bool showFilteredFiles = false;
         private string filters = "*";
@@ -1736,6 +1805,8 @@ namespace SmartCopyTool
         public int[] columnSizes = { };
         public int SortColumn = 0;
         public SortOrder SortOrder = SortOrder.Ascending;
+        public DateTime? FilterIfOlder = null;
+        public DateTime? FilterIfNewer = null;
 
 
         public Options() { }

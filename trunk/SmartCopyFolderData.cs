@@ -101,13 +101,17 @@ namespace SmartCopyTool
             if ( myFiles == null )
             {
                 myFiles = new List<FileData>();
-                foreach ( FileInfo file in dir.GetFiles() )
+
+                if (dir.Exists)
                 {
-                    myFiles.Add( new FileData( file, this ) );
+                    foreach (FileInfo file in dir.GetFiles())
+                    {
+                        myFiles.Add(new FileData(file, this));
+                    }
+
+                    // Sort, out of politeness
+                    myFiles.Sort((a, b) => a.Name.CompareTo(b.Name));
                 }
-                
-                // Sort, out of politeness
-                myFiles.Sort( (a,b) => a.Name.CompareTo( b.Name ) );
             }
             else if ( ContainsDeletedFiles )
             {
@@ -242,20 +246,51 @@ namespace SmartCopyTool
         /// <returns></returns>
         static public bool FileIsMirroredAt( FileData file, string destination, Options options )
         {
-            string target = Path.Combine( destination, file.Name );
+            DirectoryInfo dir = new DirectoryInfo(destination);
 
-            // Check if file exists (should check size too)
-            if ( File.Exists( target ) == false )
+            if (dir.Exists == false)
             {
                 return false;
             }
-            else if ( options.ignoreSize == false )
+
+            if (options.ignoreExtension)
             {
-                FileData targetFile = new FileData( target, null );
-                if ( targetFile.Length != file.Length )
+                var pattern = String.Format("{0}.*", Path.GetFileNameWithoutExtension(file.Name));
+
+                var matchingFiles = dir.EnumerateFiles(pattern, SearchOption.TopDirectoryOnly);
+
+                if (matchingFiles.Any() == false)
                 {
-                    file.Notes = String.Format( "Size mismatch: {0} -> {1}", HumanReadable.Size( file.Length ), HumanReadable.Size( targetFile.Length ) );
                     return false;
+                }
+
+                if (options.ignoreSize == false)
+                {
+                    if (matchingFiles.Any(f => f.Length == file.Length) == false)
+                    {
+                        file.Notes = String.Format("No matching file sizes : {0}", HumanReadable.Size(file.Length));
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                string target = Path.Combine(destination, file.Name);
+
+                // Check if file exists (should check size too)
+                if (File.Exists(target) == false)
+                {
+                    return false;
+                }
+
+                if (options.ignoreSize == false)
+                {
+                    FileData targetFile = new FileData(target, null);
+                    if (targetFile.Length != file.Length)
+                    {
+                        file.Notes = String.Format("Size mismatch: {0} -> {1}", HumanReadable.Size(file.Length), HumanReadable.Size(targetFile.Length));
+                        return false;
+                    }
                 }
             }
 
