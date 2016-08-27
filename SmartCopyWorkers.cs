@@ -44,6 +44,8 @@ namespace SmartCopyTool
             public string status = null;
             public TreeNode[] removedNodes = null;
             public TreeNode[] selectedNodes = null;
+            public TreeNode[] deselectedNodes = null;
+            public bool clearTree = false;
             public string[] warnings = null;              // Log warning here, parent thread will display them
             public TimeSpan timeTaken;
 
@@ -71,6 +73,15 @@ namespace SmartCopyTool
                     selectedNodes = worker.nodesSelected.ToArray();
                     worker.nodesSelected.Clear();
                 }
+                if (worker.nodesDeselected.Count > 0)
+                {
+                    deselectedNodes = worker.nodesDeselected.ToArray();
+                    worker.nodesDeselected.Clear();
+                }
+                if (worker.clearTree)
+                {
+                    clearTree = true;
+                }
             }
         }
 
@@ -92,10 +103,14 @@ namespace SmartCopyTool
         private string myStatus = "";                                      // Set this to describe what worker is currently doing
         private List<TreeNode> nodesRemoved = new List<TreeNode>();      // If we remove nodes, or want to, add them to this list and let main thread do it
         private List<TreeNode> nodesSelected = new List<TreeNode>();
+        private List<TreeNode> nodesDeselected = new List<TreeNode>();
+        private bool clearTree = false;
         private List<string> warnings = new List<string>();              // Log warning here, parent thread will display them
         private int reportedPercent = -1;
 
         protected BackgroundWorker bgw = null;                              // Want to pass into constructor really, but can't really be sure which bgw it will be until DoWork is called
+
+        protected Worker myParent = null;
 
         public bool CancellationPending { get { return bgw.CancellationPending; } }
 
@@ -124,16 +139,26 @@ namespace SmartCopyTool
         /// <returns></returns>
         public Report Invoke( BackgroundWorker bgw )
         {
-            reportedPercent = -1;
             this.bgw = bgw;
+
+            reportedPercent = -1;
             myTimer = new Stopwatch();
             myTimer.Start();
+
             myState = DoWork();
             return GetState();
         }
 
         // Subclasses should overload DoWork to do something
-        protected abstract State DoWork();
+        public abstract State DoWork();
+
+        // Set the background worker that this worker is executing on
+        public void SetParentWorker(Worker parent)
+        {
+            this.myParent = parent;
+            this.bgw = parent.bgw;
+            this.myTimer = parent.myTimer;
+        }
 
         // Log a warning to the buffer
         protected void LogWarning( string warning, params object[] args )
@@ -185,6 +210,16 @@ namespace SmartCopyTool
             nodesSelected.Add( node );
         }
 
+        protected void DeselectNode(TreeNode node)
+        {
+            nodesDeselected.Add(node);
+        }
+
+        protected void RequestClearTree()
+        {
+            clearTree = true;
+        }
+
         /// <summary>
         /// Get a report on the current state
         /// </summary>
@@ -198,13 +233,13 @@ namespace SmartCopyTool
         /// Report progress to parent thread.  Always sends copy of current state.
         /// </summary>
         /// <param name="percent"></param>
-        protected void ReportProgress( int percent )
+        protected virtual void ReportProgress( int percent )
         {
-            if ( myTimer.ElapsedMilliseconds - timeTaken > 100 )
+            if (( myTimer.ElapsedMilliseconds - timeTaken > 100 ) || (percent >= 95))
             {
                 timeTaken = myTimer.ElapsedMilliseconds;
                 reportedPercent = Math.Min( percent, 100 );
-                bgw.ReportProgress( percent, new Report( this ) );                
+                bgw.ReportProgress( percent, new Report(this) );                
             }
         }
 
@@ -265,7 +300,7 @@ namespace SmartCopyTool
             this.filesToCopy = filesToCopy;
         }
 
-        protected override State DoWork()
+        public override State DoWork()
         {
             int total = filesToCopy.Count;
 
@@ -360,7 +395,7 @@ namespace SmartCopyTool
             this.options = options;
         }
 
-        protected override State DoWork()
+        public override State DoWork()
         {
             // How many checked nodes are there?
             numNodesToMove = CountSelectedNodes( tree.Nodes[ 0 ] );
@@ -393,7 +428,7 @@ namespace SmartCopyTool
             DirectoryInfo target = new DirectoryInfo( targetName );
 
             // Try to move entire folder subtree
-            if ( CanMoveEntireNode( node ) )
+            if ( CanMoveEntireNode( node, target ) )
             {
                 // Create directory if it doesn't exist
                 if ( Directory.Exists( targetName ) == false )
@@ -521,21 +556,25 @@ namespace SmartCopyTool
         /// Check whether entire folder can be moved:
         /// 1. Folder is checked
         /// 2. No files filtered out in folder
-        /// 3. Can move all subfolders
+        /// 3. Destination path is not in the source tree
+        /// 4. Can move all subfolders
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
-        private bool CanMoveEntireNode( TreeNode node )
+        private bool CanMoveEntireNode( TreeNode node, DirectoryInfo target )
         {
             FolderData folder = (FolderData)node.Tag;
 
             if ( node.Checked == false || folder.HasSelectedFiles( options ) )
                 return false;
 
+            if (target.FullName.StartsWith(folder.FullName + "\\"))
+                return false;
+
             long moveChildren = 0;
             foreach ( TreeNode child in node.Nodes )
             {
-                if ( CanMoveEntireNode( child ) )
+                if ( CanMoveEntireNode( child, target ) )
                     moveChildren++;
             }
 
@@ -566,7 +605,7 @@ namespace SmartCopyTool
             this.options = options;
         }
 
-        protected override State DoWork()
+        public override State DoWork()
         {
             // How many checked nodes are there?
             numNodesToDelete = CountSelectedNodes( tree.Nodes[ 0 ] );
@@ -680,7 +719,7 @@ namespace SmartCopyTool
             this.operation = operation;
         }
 
-        protected override State DoWork()
+        public override State DoWork()
         {
             numNodes = tree.GetNodeCount( true );
             numProcessed = 0;
@@ -893,7 +932,7 @@ namespace SmartCopyTool
             FilterIfNewerThan = dtFilterIfNewerThan;
         }
 
-        protected override State DoWork()
+        public override State DoWork()
         {
             numNodes = tree.GetNodeCount(true);
             numProcessed = 0;
@@ -1016,7 +1055,7 @@ namespace SmartCopyTool
             this.options = options;
         }
 
-        protected override State DoWork()
+        public override State DoWork()
         {
             return AddDirectory( options.sourcePath, tree.Nodes );
         }
@@ -1111,7 +1150,7 @@ namespace SmartCopyTool
             this.bExtended = bExtended;
         }
 
-        protected override State DoWork()
+        public override State DoWork()
         {
             State result = State.COMPLETED;
 
@@ -1202,30 +1241,30 @@ namespace SmartCopyTool
     /// <summary>
     /// Restore selected files & folders from a list of filenames in a text file.  Assumes we're starting off with a blank slate (i.e. no selected nodes)
     /// </summary>
-    class SelectionReader : Worker
+    abstract class SelectionReader : Worker
     {
-        TreeView tree;
-        Options options;
+        protected TreeView tree;
+        protected Options options;
 
-        private int numNodesToSelect = 0;
-        private int numFilesToSelect = 0;
-        private int numSelected = 0;
-        private string filename = null;
+        protected int numNodesToSelect = 0;
+        protected int numFilesToSelect = 0;
+        protected int numSelected = 0;
 
-        public SelectionReader( TreeView tree, string filename, Options options )
+        public SelectionReader( TreeView tree, Options options )
             : base()
         {
             operationName = "Restoring Selection";
-            operationText = String.Format( "Restoring selection from {0}", filename );
+            operationText = String.Format( "Restoring selection");
             canCancel = true;
             canPause = true;
             showStatusMessage = true;
             this.options = options;
             this.tree = tree;
-            this.filename = filename;
         }
 
-        protected override State DoWork()
+        protected abstract void GetFilesAndNodes(List<string> sFiles, List<string> sNodes);
+
+        public override State DoWork()
         {
             State result = State.COMPLETED;
 
@@ -1235,35 +1274,7 @@ namespace SmartCopyTool
                 List<string> sFiles = new List<string>();
                 List<string> sNodes = new List<string>();
 
-                using ( StreamReader textfile = new StreamReader( filename, true ) )
-                {
-                    while ( false == textfile.EndOfStream )
-	                {
-                        string line = textfile.ReadLine();
-
-                        if ( line.StartsWith( "#NODE " ) )
-                        {
-                            line = line.Substring( "#NODE ".Length );
-                            if ( false == Path.IsPathRooted( line ) )
-                            {
-                                line = Path.Combine( options.sourcePath, line );
-                            }
-                            sNodes.Add( line );
-                        }
-                        else if ( line.Length == 0 || line.StartsWith( "#" ) )
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            if ( false == Path.IsPathRooted( line ) )
-                            {
-                                line = Path.Combine( options.sourcePath, line );
-                            }
-                            sFiles.Add( line );
-                        }
-	                }
-                }
+                GetFilesAndNodes(sFiles, sNodes);
 
                 string[] files = sFiles.ToArray();
                 string[] nodes = sNodes.ToArray();
@@ -1276,6 +1287,9 @@ namespace SmartCopyTool
                 numFilesToSelect = files.Length;
 
                 result = RestoreSelection( tree.Nodes[ 0 ], nodes, files );
+
+                Thread.Sleep(100);
+                ReportProgress(100);
             }
             catch ( Exception ex )
             {
@@ -1286,7 +1300,7 @@ namespace SmartCopyTool
             return result;
         }
 
-        private State RestoreSelection( TreeNode node, string[] nodes, string[] files )
+        protected virtual State RestoreSelection( TreeNode node, string[] nodes, string[] files )
         {
             if ( PauseRequested )
                 DoPause();
@@ -1317,10 +1331,22 @@ namespace SmartCopyTool
             // If the file contained extended NODE tags, restore them
             if ( nodes != null && nodes.Length > 0 )
             {
-                if ( Array.BinarySearch( nodes, folder.FullName, StringComparer.InvariantCultureIgnoreCase ) >= 0 )
+                if (Array.BinarySearch(nodes, folder.FullName, StringComparer.InvariantCultureIgnoreCase) >= 0)
                 {
-                    SelectNode( node );
-                    ReportProgress( ( ++numSelected * 100 ) / ( numNodesToSelect + numFilesToSelect ) );
+                    // If node was selected /* but no files are */, select all files in the folder
+                    if (options.autoselectFilesOnRestore /*&& folder.NumDirectories == 0 && !folder.ContainsCheckedFiles*/)
+                    {
+                        foreach (FileData file in folder.GetFiles())
+                        {
+                            file.Checked = true;
+                        }
+                        numFilesToSelect += folder.NumFiles;
+                        numSelected += folder.NumFiles;
+                    }
+
+                    SelectNode(node);
+
+                    ReportProgress((++numSelected * 100) / (numNodesToSelect + numFilesToSelect));
                 }
             }
             else
@@ -1349,6 +1375,316 @@ namespace SmartCopyTool
             return State.COMPLETED;
         }
 
-    } // End of SelectionWriter
+    } // End of SelectionReader
+
+    /// <summary>
+    /// Restore selected files & folders from a list of filenames in a text file.  Assumes we're starting off with a blank slate (i.e. no selected nodes)
+    /// </summary>
+    class SelectionFileReader : SelectionReader
+    {
+        private string filename = null;
+
+        public SelectionFileReader(TreeView tree, string filename, Options options)
+            : base(tree, options)
+        {
+            operationName = "Restoring Selection";
+            operationText = String.Format("Restoring selection from {0}", filename);
+            this.filename = filename;
+        }
+
+        protected override void GetFilesAndNodes(List<string> sFiles, List<string> sNodes)
+        {
+            using (StreamReader textfile = new StreamReader(filename, true))
+            {
+                while (false == textfile.EndOfStream)
+                {
+                    string line = textfile.ReadLine();
+
+                    if (line.StartsWith("#NODE "))
+                    {
+                        line = line.Substring("#NODE ".Length);
+                        if (false == Path.IsPathRooted(line))
+                        {
+                            line = Path.Combine(options.sourcePath, line);
+                        }
+                        sNodes.Add(line);
+                    }
+                    else if (line.Length == 0 || line.StartsWith("#"))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        if (false == Path.IsPathRooted(line))
+                        {
+                            line = Path.Combine(options.sourcePath, line);
+                        }
+                        sFiles.Add(line);
+                    }
+                }
+            }
+        }
+    } // end of SelectionFileReader
+
+    class SavedSelection
+    {
+        public List<string> files = new List<string>();
+        public List<string> nodes = new List<string>();
+    }
+
+    class SelectionSaver : Worker
+    {
+        SavedSelection selection;
+
+        private TreeView tree;
+        private Options options;
+
+        private int numNodesToWrite = 0;
+        private int numWritten = 0;
+
+        public SelectionSaver(TreeView tree, Options options, SavedSelection selection)
+            : base()
+        {
+            this.tree = tree;
+            this.options = options;
+            this.selection = selection;
+        }
+
+        public override State DoWork()
+        {
+            // How many checked nodes are there?
+            numNodesToWrite = CountSelectedNodes(tree.Nodes[0]);
+            numWritten = 0;
+
+            if (numNodesToWrite == 0)
+                return State.COMPLETED;
+
+            return SaveSelection(tree.Nodes[0]);
+        }
+
+        private State SaveSelection(TreeNode node)
+        {
+            if (PauseRequested)
+                DoPause();
+
+            if (CancellationPending)
+                return State.ABORTED;
+
+            FolderData folder = (FolderData)node.Tag;
+
+            if (node.Checked)
+            {
+                selection.nodes.Add(folder.FullName);
+                SetStatus("{0}", folder.FullName);
+                ReportProgress((++numWritten * 100) / numNodesToWrite);
+            }
+
+            if (folder.ContainsCheckedFiles)
+            {
+                foreach (FileData file in folder.GetSelectedFiles(options))
+                {
+                    selection.files.Add(file.FullName);
+                }
+            }
+
+            foreach (TreeNode child in node.Nodes)
+            {
+                SaveSelection(child);
+            }
+
+            return State.COMPLETED;
+        }
+    }
+
+    class SelectionRestorer : SelectionReader
+    {
+        SavedSelection selection;
+
+        public SelectionRestorer(TreeView tree, Options options, SavedSelection selection)
+            : base(tree, options)
+        {
+            this.selection = selection;
+        }
+
+        protected override void GetFilesAndNodes(List<string> sFiles, List<string> sNodes)
+        {
+            sFiles.AddRange(selection.files);
+            sNodes.AddRange(selection.nodes);
+        }
+    }
+
+
+    class DeselectionFileReader : SelectionFileReader
+    {
+        private string filename = null;
+
+        public DeselectionFileReader(TreeView tree, string filename, Options options)
+            : base(tree, filename, options)
+        {
+            operationName = "Removing Selection";
+            operationText = String.Format("Deselecting files in {0}", filename);
+            this.filename = filename;
+        }
+
+        /// <summary>
+        /// Restore selection actually deselects, here
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="nodes"></param>
+        /// <param name="files"></param>
+        /// <returns></returns>
+        protected override State RestoreSelection(TreeNode node, string[] nodes, string[] files)
+        {
+            if (PauseRequested)
+                DoPause();
+
+            if (CancellationPending)
+                return State.ABORTED;
+
+            FolderData folder = (FolderData)node.Tag;
+
+            SetStatus("{0}", folder.FullName);
+
+            folder.ContainsCheckedFiles = false;
+            folder.ContainsUncheckedFiles = false;
+
+            foreach (FileData file in folder.GetFiles())
+            {
+                if (Array.BinarySearch(files, file.FullName, StringComparer.InvariantCultureIgnoreCase) >= 0)
+                {
+                    file.Checked = false;
+                    ReportProgress((++numSelected * 100) / (numNodesToSelect + numFilesToSelect));
+                }
+            }
+
+            // If the file contained extended NODE tags, deselect them
+            if (nodes != null && nodes.Length > 0)
+            {
+                if (Array.BinarySearch(nodes, folder.FullName, StringComparer.InvariantCultureIgnoreCase) >= 0)
+                {
+                    DeselectNode(node);
+
+                    ReportProgress((++numSelected * 100) / (numNodesToSelect + numFilesToSelect));
+                }
+            }
+
+            // Children next
+            foreach (TreeNode child in node.Nodes)
+            {
+                State result = RestoreSelection(child, nodes, files);
+
+                if (result != State.COMPLETED)
+                    return result;
+            }
+
+            return State.COMPLETED;
+        }
+    } // end of DeselectionFileReader
+
+
+    /// <summary>
+    /// Rebuild directory tree asynchronously
+    /// </summary>
+    class TreeRescanner : Worker
+    {
+        TreeView tree;
+        Options options;
+
+        enum RescanStep
+        {
+            Start,
+            SaveSelection,
+            ClearTree,
+            Rescan,
+            RestoreSelection,
+            Complete
+        }
+
+        class TreeClearer : Worker
+        {
+            public TreeClearer()
+                : base()
+            { }
+
+            public override State DoWork()
+            {
+                myState = State.ACTIVE;
+                SetStatus("Clearing");
+                RequestClearTree();
+                Thread.Sleep(100);
+                ReportProgress(100);
+                return State.COMPLETED;                
+            }
+            
+        }
+
+        Worker mySubworker = null;
+
+        RescanStep myNextStep = RescanStep.Start;
+
+        SavedSelection mySavedSelection = new SavedSelection();
+
+        public TreeRescanner(TreeView tree, Options options)
+            : base()
+        {
+            operationName = "Rescanning Directories";
+            operationText = String.Format( "Rescanning directory structure of {0}", options.sourcePath );
+            canCancel = true;
+            canPause = true;
+            this.tree = tree;
+            this.options = options;
+        }
+
+        public override State DoWork()
+        {
+            myState = State.ERROR;
+
+            switch (myNextStep)
+            {
+                case RescanStep.Start:
+                    myNextStep = RescanStep.SaveSelection;
+                    myState = DoWork();
+                    break;
+
+                case RescanStep.SaveSelection:
+                    mySubworker = new SelectionSaver(tree, options, mySavedSelection);
+                    myNextStep = RescanStep.ClearTree;
+                    break;
+
+                case RescanStep.ClearTree:
+                    mySubworker = new TreeClearer();
+                    myNextStep = RescanStep.Rescan;
+                    break;
+
+                case RescanStep.Rescan:
+                    mySubworker = new TreeBuilder(tree, options);
+                    myNextStep = RescanStep.RestoreSelection;
+                    break;
+
+                case RescanStep.RestoreSelection:
+                    mySubworker = new SelectionRestorer(tree, options, mySavedSelection);
+                    myNextStep = RescanStep.Complete;
+                    break;
+
+                case RescanStep.Complete:
+                    mySubworker = null;
+                    myState = State.COMPLETED;
+                    break;
+            }
+
+            if (mySubworker != null)
+            {
+                mySubworker.SetParentWorker(this);
+                myState = mySubworker.DoWork();
+                if (myState == State.COMPLETED)
+                {
+                    myState = DoWork();
+                }
+            }
+
+            return myState;
+        }
+
+    }   // End of TreeRescanner
 }
 

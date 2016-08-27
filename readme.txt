@@ -1,5 +1,5 @@
 ﻿SmartCopy
-Copyright 2011-2014 Simon Booth
+Copyright 2011-2016 Simon Booth
 
 SmartCopy is a utility I really never expected to have to write myself.  It’s function is to manipulate files in a large, deep directory structure selectively and (hopefully) intelligently.  Operating systems’ native interfaces all seem to do a poor job of this, and the alternative tools I’ve tried all seem flawed one way or another.  I hope SmartCopy provides an improvement on existing utilities – it certainly fills my needs better than anything I’ve tried.
 
@@ -62,6 +62,11 @@ Allow overwrite
 ---------------
 Copy and move operations will not overwrite files in the target directory by default.  Check this option if you would like files from the source to be copied and moved even when this will overwrite files in the target.
 
+Autoselect Files on Restore
+---------------------------
+
+When restoring a selection, all files in a selected folder will be selected automatically.  Useful if you've renamed a bunch of files, for instance... potentially disastrous if you only actually want to copy/move a selection of files.  I recommend that you don't enable this option unless you have a specific need for it, and it is never saved enabled between sessions.
+
 
 Operations
 ==========
@@ -72,7 +77,7 @@ When SmartCopy is launched you will be asked to choose a folder - this is the so
 
 Rescan
 ------
-Rebuilds the file list from the source folder, in case of external changes or when settings have changed.  Any filtered files will be restored.  The currently selected files are lost unless saved to a text file and restored.
+Rebuilds the file list from the source folder, in case of external changes or when settings have changed.  Any filtered files will be restored.  Currently selected files and folders are automatically saved and restored (if they still exist).
 
 Copy selected files
 -------------------
@@ -81,6 +86,8 @@ You will be prompted to choose a target folder.  All files (and their containing
 Move selected files
 -------------------
 You will be prompted to choose a target folder.  All files (and their containing folders) that have been selected in the main window will be moved to the target, preserving directory structure.
+
+If the target folder is in the same directory structure as the source folder (e.g. a subfolder of the source root) then you will receive a warning that some files and folders will not be moved.  Most likely this will just be the target folder itself, which obviously can't be moved whilst you are trying to move other files and folders into it.
 
 Delete selected files
 ---------------------
@@ -143,6 +150,10 @@ Writes the current selection out to a text file.  The save dialog includes the o
 Restore selection from text file
 --------------------------------
 Restores the file selection from a previously saved text file.  Any files that are no longer present in the file list will be ignored.  Since selections are saved as relative paths, the current source directory need not be the same directory from which the selection was saved, if it has any files and folders in common.
+
+Remove selection from text file
+-------------------------------
+The inverse of "restore selection from text file" - deselects a previously saved selection.
 
 Expand selected folders
 -----------------------
