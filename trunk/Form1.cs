@@ -78,16 +78,19 @@ namespace SmartCopyTool
             myLog.SetTextbox( textBox1 );
             myLog.Write( "Initialising..." );
 
-            // Try to load settings file
-            myLog.Write( "Loading settings from " + mySettingsfile );
-            try
+            if (File.Exists(mySettingsfile))
             {
-                myOptions = Options.Load( mySettingsfile );
-            }
-            catch ( Exception e )
-            {
-                myLog.Write( "Could not load settings file ({0})... using default settings", e.Message.TrimEnd( 'r','n' ) );
-                myOptions = null;
+                // Try to load settings file
+                myLog.Write("Loading settings from " + mySettingsfile);
+                try
+                {
+                    myOptions = Options.Load(mySettingsfile);
+                }
+                catch (Exception e)
+                {
+                    myLog.Write("Could not load settings file ({0})... using default settings", e.Message.TrimEnd('r', 'n'));
+                    myOptions = null;
+                }
             }
 
             // Set default options if it failed
@@ -99,6 +102,7 @@ namespace SmartCopyTool
                 myOptions.ignoreExtension = menuIgnoreExtension.Checked;
                 myOptions.allowOverwrite = menuAllowOverwrite.Checked;
                 myOptions.showFilteredFiles = menuShowFilteredFiles.Checked;
+                myOptions.autoselectFilesOnRestore = menuAutoselectFiles.Checked;
                 myOptions.windowSize = this.Size;
                 myOptions.windowLocation = this.Location;
                 myOptions.columnSizes = new int[ fileListView.Columns.Count ];
@@ -117,6 +121,7 @@ namespace SmartCopyTool
             menuIgnoreExtension.Checked = myOptions.ignoreExtension;
             menuAllowOverwrite.Checked = myOptions.allowOverwrite;
             menuShowFilteredFiles.Checked = myOptions.showFilteredFiles;
+            menuAutoselectFiles.Checked = myOptions.autoselectFilesOnRestore;
             if ( myOptions.columnSizes != null && myOptions.columnSizes.Count() == fileListView.Columns.Count )
             {
                 for ( int i = 0; i < fileListView.Columns.Count; i++ )
@@ -525,12 +530,20 @@ namespace SmartCopyTool
             // There are occasions when it might be quite useful to permit it, e.g. moving a selection of subfolders
             // into a different subfolder, but would have to check whether destination was due to be moved... which is
             // probably not that difficult really (worst case would be to scan the whole tree)
-            if ( dst.FullName == src.FullName || dst.FullName.StartsWith( src.FullName + "\\" ) )
+            if ( dst.FullName == src.FullName )
             {
+
                 // Should really check for moving a directory tree into itself or any of its subfolders
-                MessageBox.Show( "Cannot move folder into itself!", "Error!", MessageBoxButtons.OK );
+                MessageBox.Show( "Cannot move folder into its own path!", "Error!", MessageBoxButtons.OK );
+                return result;
             }
-            else if ( GetSelectedFiles( directoryTree.Nodes[0] ).Count == 0 )       // This could take a while, is it worth it just to show the warning?
+
+            if ( dst.FullName.StartsWith(src.FullName + "\\") )
+            {
+                MessageBox.Show("Destination is in same path as source, some files and folders may not be moved.", "Warning!", MessageBoxButtons.OK);
+            }
+            
+            if ( GetSelectedFiles( directoryTree.Nodes[0] ).Count == 0 )       // This could take a while, is it worth it just to show the warning?
             {
                 MessageBox.Show( "No files selected, nothing to move!", "Cannot comply", MessageBoxButtons.OK );                
             }
@@ -810,9 +823,9 @@ namespace SmartCopyTool
         /// <param name="e"></param>
         private void menuRescan_Click( object sender, EventArgs e )
         {
-            BuildDirectoryTree( myOptions, true );
+            PerformBackgroundOperation(new TreeRescanner(directoryTree, myOptions));
         }
-        
+
         /// <summary>
         /// Exit menu handler
         /// </summary>
@@ -889,6 +902,17 @@ namespace SmartCopyTool
                 DisplayFolderContents( directoryTree.SelectedNode );
             }
         }
+
+        /// <summary>
+        /// State of "Autoselect files on restore" changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void menuAutoselectFiles_CheckedChanged(object sender, EventArgs e)
+        {
+            myOptions.autoselectFilesOnRestore = menuAutoselectFiles.Checked;
+        }
+
 
         /// <summary>
         /// Handle Remove Mirrored items menu selection
@@ -1147,12 +1171,40 @@ namespace SmartCopyTool
                 {
                     directoryTree.Nodes[ 0 ].Checked = false;
                     bCheckNodeChildren = false;     // Ugh, really wanted to avoid having to do this, but it is the simplest fix right now
-                    PerformLongOperation( new SelectionReader( directoryTree, openFileDialog.FileName, myOptions ) );
+                    PerformLongOperation( new SelectionFileReader( directoryTree, openFileDialog.FileName, myOptions ) );
                 }
             }
             else
             {
                 MessageBox.Show( "Cannot restore selection to empty tree" );
+            }
+            bCheckNodeChildren = restore;
+        }
+
+        /// <summary>
+        /// Read a list of filenames from a text file and deselect the corresponding tree nodes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void menuRemoveSelection_Click(object sender, EventArgs e)
+        {
+            bool restore = bCheckNodeChildren;
+
+            if (directoryTree.Nodes.Count > 0)
+            {
+                openFileDialog.InitialDirectory = myOptions.sourcePath;
+                openFileDialog.Filter = "Text Files (*.txt,*.m3u,*.m3u8)|*.txt;*.m3u;*.m3u8|All Files|*.*";
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    directoryTree.Nodes[0].Checked = false;
+                    bCheckNodeChildren = false;     // Ugh, really wanted to avoid having to do this, but it is the simplest fix right now
+                    PerformLongOperation(new DeselectionFileReader(directoryTree, openFileDialog.FileName, myOptions));
+                }
+            }
+            else
+            {
+                MessageBox.Show("Cannot remove selection from empty tree");
             }
             bCheckNodeChildren = restore;
         }
@@ -1627,6 +1679,25 @@ namespace SmartCopyTool
                 directoryTree.EndUpdate();
             }
 
+            if (report.deselectedNodes != null)
+            {
+                directoryTree.BeginUpdate();
+                foreach (TreeNode node in report.deselectedNodes)
+                {
+                    node.Checked = false;
+                }
+
+                report.deselectedNodes = null;
+                directoryTree.EndUpdate();
+            }
+
+            if (report.clearTree)
+            {
+                directoryTree.BeginUpdate();
+                directoryTree.Nodes.Clear();
+                directoryTree.EndUpdate();
+            }
+
             myLog.EndUpdate();
             return report.state;
         }
@@ -1714,7 +1785,6 @@ namespace SmartCopyTool
             }
         }
 
-
     }
 
     /// <summary>
@@ -1798,6 +1868,7 @@ namespace SmartCopyTool
         public bool ignoreExtension = false;
         public bool allowOverwrite = false;
         public bool showFilteredFiles = false;
+        public bool autoselectFilesOnRestore = false;
         private string filters = "*";
         public Regex filtersRegex = null;
         public Size windowSize;
@@ -1820,6 +1891,7 @@ namespace SmartCopyTool
             ignoreSize = options.ignoreSize;
             allowOverwrite = options.allowOverwrite;
             showFilteredFiles = options.showFilteredFiles;
+            autoselectFilesOnRestore = options.autoselectFilesOnRestore;
             filters = options.filters;                  // copy reference, bypass the property Filters
             windowSize = options.windowSize;
             windowLocation = options.windowLocation;
@@ -1848,7 +1920,9 @@ namespace SmartCopyTool
 
         public void Save( string filename )
         {
-            XmlSerializer xml = new XmlSerializer( this.GetType() );
+            autoselectFilesOnRestore = false;       // Too risky to leave on!
+
+            XmlSerializer xml = new XmlSerializer(this.GetType());
             XmlTextWriter writer = new XmlTextWriter( filename, null );
             xml.Serialize( writer, this );
             writer.Close();
