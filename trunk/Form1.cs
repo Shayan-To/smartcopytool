@@ -780,7 +780,8 @@ namespace SmartCopyTool
 
                 // OK, check/uncheck all files too...
                 FolderData folder = (FolderData)node.Tag;
-                foreach ( FileData file in folder.GetFiles() )
+                var files = folder.GetFiles().ToArray();
+                foreach ( FileData file in files )
                 {
                     if ( file.Checked != bChecked )
                     {
@@ -1620,6 +1621,10 @@ namespace SmartCopyTool
         /// <returns></returns>
         private Worker.State ProcessWorkerReport( Worker.Report report )
         {
+            bool restore = bCheckNodeChildren;
+
+            bCheckNodeChildren = false;     // Ugh, don't select all the subfolders of a selected node when rescanning (ugly)
+
             myLog.BeginUpdate();
 
             if ( myProgress != null )
@@ -1670,6 +1675,7 @@ namespace SmartCopyTool
             if ( report.selectedNodes != null )
             {
                 directoryTree.BeginUpdate();
+
                 foreach ( TreeNode node in report.selectedNodes )
                 {
                     node.Checked = true;
@@ -1697,6 +1703,8 @@ namespace SmartCopyTool
                 directoryTree.Nodes.Clear();
                 directoryTree.EndUpdate();
             }
+
+            bCheckNodeChildren = restore;
 
             myLog.EndUpdate();
             return report.state;

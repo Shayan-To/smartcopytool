@@ -122,7 +122,7 @@
             // label1
             // 
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(96, 17);
+            this.label1.Size = new System.Drawing.Size(95, 17);
             this.label1.Text = "Smart Copy Tool";
             // 
             // statusMenu
@@ -404,14 +404,14 @@
             // menuSetFilters
             // 
             this.menuSetFilters.Name = "menuSetFilters";
-            this.menuSetFilters.Size = new System.Drawing.Size(217, 22);
+            this.menuSetFilters.Size = new System.Drawing.Size(268, 22);
             this.menuSetFilters.Text = "Set Filename Filters";
             this.menuSetFilters.Click += new System.EventHandler(this.menuSetFilters_Click);
             // 
             // menuClearFilters
             // 
             this.menuClearFilters.Name = "menuClearFilters";
-            this.menuClearFilters.Size = new System.Drawing.Size(217, 22);
+            this.menuClearFilters.Size = new System.Drawing.Size(268, 22);
             this.menuClearFilters.Text = "Clear Filename Filters";
             this.menuClearFilters.Click += new System.EventHandler(this.menuClearFilters_Click);
             // 
@@ -419,20 +419,20 @@
             // 
             this.menuShowFilteredFiles.CheckOnClick = true;
             this.menuShowFilteredFiles.Name = "menuShowFilteredFiles";
-            this.menuShowFilteredFiles.Size = new System.Drawing.Size(217, 22);
+            this.menuShowFilteredFiles.Size = new System.Drawing.Size(268, 22);
             this.menuShowFilteredFiles.Text = "Show Filtered Files";
             this.menuShowFilteredFiles.CheckedChanged += new System.EventHandler(this.menuShowFilteredFiles_CheckedChanged);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(214, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(265, 6);
             // 
             // menuIncludeHidden
             // 
             this.menuIncludeHidden.CheckOnClick = true;
             this.menuIncludeHidden.Name = "menuIncludeHidden";
-            this.menuIncludeHidden.Size = new System.Drawing.Size(217, 22);
+            this.menuIncludeHidden.Size = new System.Drawing.Size(268, 22);
             this.menuIncludeHidden.Text = "Include Hidden Files";
             this.menuIncludeHidden.ToolTipText = "Include hidden files in copy/move/compare operations";
             this.menuIncludeHidden.CheckedChanged += new System.EventHandler(this.menuIncludeHidden_CheckedChanged);
@@ -441,7 +441,7 @@
             // 
             this.menuIgnoreSize.CheckOnClick = true;
             this.menuIgnoreSize.Name = "menuIgnoreSize";
-            this.menuIgnoreSize.Size = new System.Drawing.Size(217, 22);
+            this.menuIgnoreSize.Size = new System.Drawing.Size(268, 22);
             this.menuIgnoreSize.Text = "Ignore Size";
             this.menuIgnoreSize.ToolTipText = "Ignore file sizes when checking for mirrored or unmirrored files and folders";
             this.menuIgnoreSize.CheckedChanged += new System.EventHandler(this.menuIgnoreSize_CheckedChanged);
@@ -450,7 +450,7 @@
             // 
             this.menuIgnoreExtension.CheckOnClick = true;
             this.menuIgnoreExtension.Name = "menuIgnoreExtension";
-            this.menuIgnoreExtension.Size = new System.Drawing.Size(217, 22);
+            this.menuIgnoreExtension.Size = new System.Drawing.Size(268, 22);
             this.menuIgnoreExtension.Text = "Ignore Extension";
             this.menuIgnoreExtension.ToolTipText = "Ignore file extensions when checked";
             this.menuIgnoreExtension.CheckedChanged += new System.EventHandler(this.menuIgnoreExtension_CheckedChanged);
@@ -459,7 +459,7 @@
             // 
             this.menuAllowOverwrite.CheckOnClick = true;
             this.menuAllowOverwrite.Name = "menuAllowOverwrite";
-            this.menuAllowOverwrite.Size = new System.Drawing.Size(217, 22);
+            this.menuAllowOverwrite.Size = new System.Drawing.Size(268, 22);
             this.menuAllowOverwrite.Text = "Allow Overwrite";
             this.menuAllowOverwrite.ToolTipText = "Overwrite files in destination when  copying or moving";
             this.menuAllowOverwrite.CheckedChanged += new System.EventHandler(this.menuAllowOverwrite_CheckedChanged);
@@ -467,14 +467,14 @@
             // toolStripSeparator9
             // 
             this.toolStripSeparator9.Name = "toolStripSeparator9";
-            this.toolStripSeparator9.Size = new System.Drawing.Size(214, 6);
+            this.toolStripSeparator9.Size = new System.Drawing.Size(265, 6);
             // 
             // menuAutoselectFiles
             // 
             this.menuAutoselectFiles.CheckOnClick = true;
             this.menuAutoselectFiles.Name = "menuAutoselectFiles";
-            this.menuAutoselectFiles.Size = new System.Drawing.Size(217, 22);
-            this.menuAutoselectFiles.Text = "Autoselect Files On Restore";
+            this.menuAutoselectFiles.Size = new System.Drawing.Size(268, 22);
+            this.menuAutoselectFiles.Text = "Autoselect Files On Selection Restore";
             this.menuAutoselectFiles.ToolTipText = "When restoring selections from file, autoselect files in selected folders";
             this.menuAutoselectFiles.CheckedChanged += new System.EventHandler(this.menuAutoselectFiles_CheckedChanged);
             // 

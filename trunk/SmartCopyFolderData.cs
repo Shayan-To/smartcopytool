@@ -102,15 +102,18 @@ namespace SmartCopyTool
             {
                 myFiles = new List<FileData>();
 
-                if (dir.Exists)
+                lock (myFiles)
                 {
-                    foreach (FileInfo file in dir.GetFiles())
+                    if (dir.Exists)
                     {
-                        myFiles.Add(new FileData(file, this));
-                    }
+                        foreach (FileInfo file in dir.GetFiles())
+                        {
+                            myFiles.Add(new FileData(file, this));
+                        }
 
-                    // Sort, out of politeness
-                    myFiles.Sort((a, b) => a.Name.CompareTo(b.Name));
+                        // Sort, out of politeness
+                        myFiles.Sort((a, b) => a.Name.CompareTo(b.Name));
+                    }
                 }
             }
             else if ( ContainsDeletedFiles )
@@ -125,10 +128,18 @@ namespace SmartCopyTool
                         newList.Add( file );
                     }                    
                 }
-                myFiles = newList;
+                lock (myFiles)
+                {
+                    myFiles = newList;
+                }
                 ContainsDeletedFiles = false;
             }
-            return myFiles;
+
+            // Try to get a lock on myFiles to make sure it's not being built
+            lock (myFiles)
+            {
+                return myFiles;
+            }
         }
 
         public int NumSelectedFiles( Options options )
