@@ -159,6 +159,11 @@ Expand selected folders
 -----------------------
 Any folders which are currently selected or contain selected files will be expanded in the file list, making it easier to see what has been selected.
 
+Select All Files in Selected Folders
+-----------------------
+Any unselected files in selected folders will be checked.  This can be particularly useful after changing filters (e.g. after changing "*.jpg" to "*.jpg;*.jpeg"), to automatically select files that were previously filtered.
+
+
 
 
 
