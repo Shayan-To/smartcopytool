@@ -1250,6 +1250,38 @@ namespace SmartCopyTool
             return bExpand;
         }
 
+        private void menuSelectAllInSelected_Click(object sender, EventArgs e)
+        {
+            if (directoryTree.Nodes.Count > 0)
+            {
+                doRecurseSelectFilesIfSelected(directoryTree.Nodes[0]);
+
+                DisplayFolderContents(directoryTree.SelectedNode);
+            }
+        }
+
+        private void doRecurseSelectFilesIfSelected(TreeNode node)
+        {
+            FolderData folder = (FolderData)node.Tag;
+
+            if (node.Checked)
+            {
+                foreach (FileData file in folder.GetFiles())
+                {
+                    if (!file.Checked && !file.Filtered)
+                    {
+                        file.Checked = true;
+                    }
+                }
+            }
+
+            foreach (TreeNode child in node.Nodes)
+            {
+                doRecurseSelectFilesIfSelected(child);
+            }
+        }
+
+
 
         /// <summary>
         /// Set filename filters.  

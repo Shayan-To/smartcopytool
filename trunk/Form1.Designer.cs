@@ -60,6 +60,7 @@
             this.menuRestoreSelection = new System.Windows.Forms.ToolStripMenuItem();
             this.menuRemoveSelection = new System.Windows.Forms.ToolStripMenuItem();
             this.menuExpandSelectedFolders = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuSelectAllInSelected = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.menuExit = new System.Windows.Forms.ToolStripMenuItem();
             this.filtersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -199,6 +200,7 @@
             this.menuRestoreSelection,
             this.menuRemoveSelection,
             this.menuExpandSelectedFolders,
+            this.menuSelectAllInSelected,
             this.toolStripSeparator6,
             this.menuExit});
             this.fileMenu.Name = "fileMenu";
@@ -370,6 +372,13 @@
             this.menuExpandSelectedFolders.Size = new System.Drawing.Size(293, 22);
             this.menuExpandSelectedFolders.Text = "Expand Selected Folders";
             this.menuExpandSelectedFolders.Click += new System.EventHandler(this.menuExpandSelectedFolders_Click);
+            // 
+            // menuSelectAllInSelected
+            // 
+            this.menuSelectAllInSelected.Name = "menuSelectAllInSelected";
+            this.menuSelectAllInSelected.Size = new System.Drawing.Size(293, 22);
+            this.menuSelectAllInSelected.Text = "Select All Files In Selected Folders";
+            this.menuSelectAllInSelected.Click += new System.EventHandler(this.menuSelectAllInSelected_Click);
             // 
             // toolStripSeparator6
             // 
@@ -751,7 +760,7 @@
         private System.Windows.Forms.ToolStripMenuItem menuRemoveSelection;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator9;
         private System.Windows.Forms.ToolStripMenuItem menuAutoselectFiles;
-
+        private System.Windows.Forms.ToolStripMenuItem menuSelectAllInSelected;
     }
 }
 
