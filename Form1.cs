@@ -512,6 +512,52 @@ namespace SmartCopyTool
         }
 
         /// <summary>
+        /// Copy selected files and folders to target directory
+        /// </summary>
+        private DialogResult FlattenSelectedFolders(bool bRunInBackground = false)
+        {
+            DialogResult result = DialogResult.OK;
+
+            List<FileData> filesToCopy = GetSelectedFiles(directoryTree.Nodes[0]);
+
+            // Check for files with the same name
+            HashSet<string> filenames = new HashSet<string>();
+            foreach (FileData ftc in filesToCopy)
+            {
+                if (filenames.Contains(ftc.Name))
+                {
+                    if (MessageBox.Show($"Files have the same name ({ftc.Name}), only one will be kept", "Filename conflict", MessageBoxButtons.OKCancel) == DialogResult.Cancel)
+                    {
+                        return DialogResult.Cancel;
+                    }
+                }
+                else
+                {
+                    filenames.Add(ftc.Name);
+                }
+            }
+
+            if (filesToCopy.Count > 0)
+            {
+                myLog.Write("Copying {0} files to {1}", filesToCopy.Count, myOptions.targetPath);
+                if (bRunInBackground)
+                {
+                    PerformBackgroundOperation(new FileFlattener(filesToCopy, myOptions));
+                }
+                else
+                {
+                    result = PerformLongOperation(new FileFlattener(filesToCopy, myOptions));
+                }
+            }
+            else
+            {
+                MessageBox.Show("No files selected, nothing to copy!", "Cannot comply", MessageBoxButtons.OK);
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Move selected files and folders to target directory.
         /// Massively more complicated than a copy operation because of the need to remove
         /// any empty folders left behind after all files moved.  Could just move files and
@@ -1028,6 +1074,22 @@ namespace SmartCopyTool
             {
                 myOptions.targetPath = folderBrowserDialog2.SelectedPath;
                 MoveSelectedFolders( false );
+            }
+        }
+
+        /// <summary>
+        /// Copy all selected files into a single target directory
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void menuFlatten_Click(object sender, EventArgs e)
+        {
+            folderBrowserDialog2.SelectedPath = myOptions.targetPath;
+
+            if (folderBrowserDialog2.ShowDialog() == DialogResult.OK)
+            {
+                myOptions.targetPath = folderBrowserDialog2.SelectedPath;
+                FlattenSelectedFolders(false);
             }
         }
 
@@ -1824,7 +1886,6 @@ namespace SmartCopyTool
                 }
             }
         }
-
     }
 
     /// <summary>

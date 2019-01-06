@@ -41,6 +41,7 @@
             this.fileMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.menuCopy = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMove = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuFlatten = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.menuChangeSourceFolder = new System.Windows.Forms.ToolStripMenuItem();
             this.menuRescan = new System.Windows.Forms.ToolStripMenuItem();
@@ -181,6 +182,7 @@
             this.fileMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuCopy,
             this.menuMove,
+            this.menuFlatten,
             this.toolStripSeparator8,
             this.menuChangeSourceFolder,
             this.menuRescan,
@@ -224,6 +226,15 @@
             this.menuMove.Text = "&Move Selected Files";
             this.menuMove.ToolTipText = "Move selected files and folders to a target directory";
             this.menuMove.Click += new System.EventHandler(this.menuMove_Click);
+            // 
+            // menuFlatten
+            // 
+            this.menuFlatten.Name = "menuFlatten";
+            this.menuFlatten.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.F)));
+            this.menuFlatten.Size = new System.Drawing.Size(293, 22);
+            this.menuFlatten.Text = "&Flatten Selected Files";
+            this.menuFlatten.Click += new System.EventHandler(this.menuFlatten_Click);
             // 
             // toolStripSeparator8
             // 
@@ -761,6 +772,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator9;
         private System.Windows.Forms.ToolStripMenuItem menuAutoselectFiles;
         private System.Windows.Forms.ToolStripMenuItem menuSelectAllInSelected;
+        private System.Windows.Forms.ToolStripMenuItem menuFlatten;
     }
 }
 

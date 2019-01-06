@@ -313,50 +313,50 @@ namespace SmartCopyTool
 
                 foreach ( FileData file in filesToCopy )
                 {
-                    Debug.Assert( file.FullName.StartsWith( src.FullName ), "Walked into a folder that is not a subdirectory of root!" );
+                    Debug.Assert(file.FullName.StartsWith(src.FullName), "Walked into a folder that is not a subdirectory of root!");
 
-                    if ( PauseRequested )
+                    if (PauseRequested)
                         DoPause();
 
-                    if ( CancellationPending )
+                    if (CancellationPending)
                         return State.ABORTED;
 
-                    string targetName = RerootPath( file.FullName, src.FullName, dst.FullName );
+                    string targetName = GetTargetPath(src, dst, file);
 
-                    SetStatus( GetRelativePath( file.FullName, src.FullName ) );
-                    ReportProgress( ( ++count * 100 ) / total );
+                    SetStatus(GetRelativePath(file.FullName, src.FullName));
+                    ReportProgress((++count * 100) / total);
 
                     try
                     {
                         // Copy the file
-                        if ( options.allowOverwrite && File.Exists( targetName ) )
+                        if (options.allowOverwrite && File.Exists(targetName))
                         {
-                            LogWarning( "Overwriting {0}", targetName );
-                            System.IO.File.Delete( targetName );
-                            System.IO.File.Copy( file.FullName, targetName );
+                            LogWarning("Overwriting {0}", targetName);
+                            System.IO.File.Delete(targetName);
+                            System.IO.File.Copy(file.FullName, targetName);
                         }
-                        else if ( !File.Exists( targetName ) )
+                        else if (!File.Exists(targetName))
                         {
-                            FileData target = new FileData( targetName, null );
+                            FileData target = new FileData(targetName, null);
 
                             // Create directory if it doesn't exist
-                            if ( Directory.Exists( target.DirectoryName ) == false )
+                            if (Directory.Exists(target.DirectoryName) == false)
                             {
-                                Directory.CreateDirectory( target.DirectoryName );
+                                Directory.CreateDirectory(target.DirectoryName);
                             }
 
-                            System.IO.File.Copy( file.FullName, targetName );
+                            System.IO.File.Copy(file.FullName, targetName);
                         }
                         else
                         {
-                            LogWarning( "Skipping {0}", targetName );
+                            LogWarning("Skipping {0}", targetName);
                         }
 
                     }
-                    catch ( Exception ex )
+                    catch (Exception ex)
                     {
                         file.Notes = ex.Message;
-                        LogWarning( "Could not copy {0} - {1}", targetName, ex.Message );
+                        LogWarning("Could not copy {0} - {1}", targetName, ex.Message);
                     }
 
                 }
@@ -365,8 +365,32 @@ namespace SmartCopyTool
             return State.COMPLETED;
         }
 
+        /// <summary>
+        /// Get the fully qualified path name for the destination file
+        /// </summary>
+        protected virtual string GetTargetPath(DirectoryInfo src, DirectoryInfo dst, FileData file)
+        {
+            return RerootPath(file.FullName, src.FullName, dst.FullName);
+        }
     }   // End of FileCopier
 
+    /// <summary>
+    /// Asynchronous worker to copy selected files to a single target directory
+    /// </summary>
+    class FileFlattener : FileCopier
+    {
+        public FileFlattener(List<FileData> filesToCopy, Options options)
+            : base(filesToCopy, options)
+        {
+            operationName = "Flattening Files";
+            operationText = String.Format("Copying {0} files from {1} to {2}", filesToCopy.Count, options.sourcePath, options.targetPath);
+        }
+
+        protected override string GetTargetPath(DirectoryInfo src, DirectoryInfo dst, FileData file)
+        {
+            return Path.Combine(dst.FullName, file.Name);
+        }
+    }
 
     /// <summary>
     /// Move selected files and folders to target directory.
