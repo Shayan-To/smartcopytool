@@ -1,9 +1,15 @@
 ﻿SmartCopy
-Copyright 2011-2016 Simon Booth
+Copyright 2011-2019 Simon Booth
+===============================
 
-SmartCopy is a utility I really never expected to have to write myself.  It’s function is to manipulate files in a large, deep directory structure selectively and (hopefully) intelligently.  Operating systems’ native interfaces all seem to do a poor job of this, and the alternative tools I’ve tried all seem flawed one way or another.  I hope SmartCopy provides an improvement on existing utilities – it certainly fills my needs better than anything I’ve tried.
+SmartCopy is a utility I really never expected to have to write myself.  It’s function is to manipulate files in a large, deep directory structure selectively and (hopefully) intelligently.  
 
-What are the functions that SmartCopy provides?  It’s basic job is to provide selective backups of a directory structure.  I initially wrote it to help populate a small mp3 player (20gb) from a very large mp3 collection (500gb) – a task which seems unnecessarily difficult using Windows Explorer (for example).  Perhaps I have an uncommonly large media collection, or perhaps I organise it rather more obsessively than others, but it does surprise me that this task does not have a wealth of utilities designed to make it as efficient and painless as possible (I count iTunes as an example of an extremely bad utility for the purpose).
+Operating systems’ native interfaces traditionally did a poor job of this, though the options in Windows 10 are a lot better than they used to be.  The tool fills a gap that alternative tools don't seem to cover.
+
+What are the functions that SmartCopy provides?  
+-----------------------------------------------
+
+It’s basic job is to provide selective backups of a directory structure.  I initially wrote it to help populate a small mp3 player (20gb) from a very large mp3 collection (500gb) – a task which seems unnecessarily difficult using Windows Explorer (for example).  Perhaps I have an uncommonly large media collection, or perhaps I organise it rather more obsessively than others, but it does surprise me that this task does not have a wealth of utilities designed to make it as efficient and painless as possible (I count iTunes as an example of an extremely bad utility for the purpose).
 
 The more general case I use the tool for is maintaining backups.  I backup parts of my collection on to a variety of devices – large stores for permanent backups, portable drives for mobile libraries, etc.  It also useful for general organisation and maintenance of any large collection of files.
 
@@ -28,8 +34,7 @@ Some advantages of using SmartCopy for these sorts of operations include:
 - Comparisons and filtering are done up-front, so you know you are not going to be bothered 2 hours in to a long backup with a prompt asking if you want to overwrite something.
 - Long operations can be paused and resumed – useful if you’re doing a backup over the network and need to temporarily free up bandwidth to make a Skype call, for instance.
 
-The original version of the tool was written in Python back in 2007, when cross-platform compatibility seemed important to me.  However, I found that Python’s cross-platform capabilities did not out-weigh the inconvenience of not having Python installed on other machines I wished to copy parts of my media collection on to when I was travelling.  Since I wanted to learn some C# and .NET, I decided that converting SmartCopy to that platform was a useful exercise with a practical end product.  Hence, the latest version is written in C# and targetted for .NET runtime 4.0.
-
+The original version of the tool was written in Python back in 2007, when cross-platform compatibility seemed important to me.  However, I found that Python’s cross-platform capabilities did not out-weigh the inconvenience of not having Python installed on other machines, and since I wanted to learn some C# and .NET, I decided that converting SmartCopy to that platform was a useful exercise with a practical end product.
 
 Options
 =======
@@ -88,6 +93,12 @@ Move selected files
 You will be prompted to choose a target folder.  All files (and their containing folders) that have been selected in the main window will be moved to the target, preserving directory structure.
 
 If the target folder is in the same directory structure as the source folder (e.g. a subfolder of the source root) then you will receive a warning that some files and folders will not be moved.  Most likely this will just be the target folder itself, which obviously can't be moved whilst you are trying to move other files and folders into it.
+
+Flatten selected files
+----------------------
+You will be prompted to choose a target folder.  All files (and their containing folders) that have been selected in the main window will be copied to the target, flattening the directory structure.
+
+If files have the same name a warning will be given that only one file will be kept (first or last depends on whether overwrite is allowed), offering an opportunity to cancel.
 
 Delete selected files
 ---------------------
