@@ -101,6 +101,7 @@ namespace SmartCopyTool
                 myOptions.ignoreSize = menuIgnoreSize.Checked;
                 myOptions.ignoreExtension = menuIgnoreExtension.Checked;
                 myOptions.allowOverwrite = menuAllowOverwrite.Checked;
+                myOptions.allowDeleteReadOnly = menuDeleteReadOnly.Checked;
                 myOptions.showFilteredFiles = menuShowFilteredFiles.Checked;
                 myOptions.autoselectFilesOnRestore = menuAutoselectFiles.Checked;
                 myOptions.windowSize = this.Size;
@@ -120,6 +121,7 @@ namespace SmartCopyTool
             menuIgnoreSize.Checked = myOptions.ignoreSize;
             menuIgnoreExtension.Checked = myOptions.ignoreExtension;
             menuAllowOverwrite.Checked = myOptions.allowOverwrite;
+            menuDeleteReadOnly.Checked = myOptions.allowDeleteReadOnly;
             menuShowFilteredFiles.Checked = myOptions.showFilteredFiles;
             menuAutoselectFiles.Checked = myOptions.autoselectFilesOnRestore;
             if ( myOptions.columnSizes != null && myOptions.columnSizes.Count() == fileListView.Columns.Count )
@@ -934,6 +936,16 @@ namespace SmartCopyTool
         private void menuAllowOverwrite_CheckedChanged( object sender, EventArgs e )
         {
             myOptions.allowOverwrite = menuAllowOverwrite.Checked;
+        }
+
+        /// <summary>
+        /// State of 'Delete read only files' menu option changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void menuDeleteReadOnly_CheckedChanged(object sender, EventArgs e)
+        {
+            myOptions.allowDeleteReadOnly = menuDeleteReadOnly.Checked;
         }
 
         /// <summary>
@@ -1968,6 +1980,7 @@ namespace SmartCopyTool
         public bool ignoreSize = false;
         public bool ignoreExtension = false;
         public bool allowOverwrite = false;
+        public bool allowDeleteReadOnly = false;
         public bool showFilteredFiles = false;
         public bool autoselectFilesOnRestore = false;
         private string filters = "*";
@@ -1991,6 +2004,7 @@ namespace SmartCopyTool
             includeHidden = options.includeHidden;
             ignoreSize = options.ignoreSize;
             allowOverwrite = options.allowOverwrite;
+            allowDeleteReadOnly = options.allowDeleteReadOnly;
             showFilteredFiles = options.showFilteredFiles;
             autoselectFilesOnRestore = options.autoselectFilesOnRestore;
             filters = options.filters;                  // copy reference, bypass the property Filters

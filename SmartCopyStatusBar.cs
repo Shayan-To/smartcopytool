@@ -165,6 +165,11 @@ namespace SmartCopyTool
                     substring += " (Allow Overwrite)";
                 }
 
+                if (options.allowDeleteReadOnly == true)
+                {
+                    substring += " (Allow read-only deletion)";
+                }
+
                 if ( options.showFilteredFiles == true )
                 {
                     substring += " (Show Filtered Files)";
@@ -209,7 +214,8 @@ namespace SmartCopyTool
                          parentOptions.sourcePath != statusBarOptions.sourcePath ||
                          parentOptions.ignoreSize != statusBarOptions.ignoreSize ||
                          parentOptions.ignoreExtension != statusBarOptions.ignoreExtension ||
-                         parentOptions.allowOverwrite != statusBarOptions.allowOverwrite )
+                         parentOptions.allowOverwrite != statusBarOptions.allowOverwrite ||
+                         parentOptions.allowDeleteReadOnly != statusBarOptions.allowDeleteReadOnly)
                     {
                         statusBarOptions = new Options( parentOptions );
                     }

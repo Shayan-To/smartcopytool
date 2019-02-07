@@ -328,17 +328,22 @@ namespace SmartCopyTool
 
                     try
                     {
+                        FileData target = new FileData(targetName, null);
+
                         // Copy the file
                         if (options.allowOverwrite && File.Exists(targetName))
                         {
                             LogWarning("Overwriting {0}", targetName);
+                            if (target.ReadOnly && options.allowDeleteReadOnly)
+                            {
+                                target.ReadOnly = false;
+                            }
                             System.IO.File.Delete(targetName);
                             System.IO.File.Copy(file.FullName, targetName);
                         }
-                        else if (!File.Exists(targetName))
-                        {
-                            FileData target = new FileData(targetName, null);
 
+                        if (!File.Exists(targetName))
+                        {
                             // Create directory if it doesn't exist
                             if (Directory.Exists(target.DirectoryName) == false)
                             {
@@ -525,16 +530,20 @@ namespace SmartCopyTool
                    
                     try
                     {
-                        if ( !File.Exists( targetFilename ) )
+                        if (options.allowOverwrite && File.Exists(targetFilename))
                         {
-                            System.IO.File.Move( file.FullName, targetFilename );
-                            file.Deleted = true;
-                        }
-                        else if ( options.allowOverwrite )
-                        {
-                            LogWarning( "Overwriting {0}", targetFilename );
+                            LogWarning("Overwriting {0}", targetFilename);
+                            FileData targetFile = new FileData(targetFilename, null);
+                            if (targetFile.ReadOnly)
+                            {
+                                targetFile.ReadOnly = false;
+                            }
                             System.IO.File.Delete( targetFilename );
-                            System.IO.File.Move( file.FullName, targetFilename );
+                        }
+
+                        if (!File.Exists(targetFilename))
+                        {
+                            System.IO.File.Move(file.FullName, targetFilename);
                             file.Deleted = true;
                         }
                         else
@@ -682,6 +691,11 @@ namespace SmartCopyTool
 
                         try
                         {
+                            if (options.allowDeleteReadOnly && file.ReadOnly)
+                            {
+                                file.ReadOnly = false;
+                            }
+
                             File.Delete( file.FullName );
                             file.Deleted = true;
                         }

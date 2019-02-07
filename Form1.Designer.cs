@@ -73,6 +73,7 @@
             this.menuIgnoreSize = new System.Windows.Forms.ToolStripMenuItem();
             this.menuIgnoreExtension = new System.Windows.Forms.ToolStripMenuItem();
             this.menuAllowOverwrite = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuDeleteReadOnly = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             this.menuAutoselectFiles = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -415,6 +416,7 @@
             this.menuIgnoreSize,
             this.menuIgnoreExtension,
             this.menuAllowOverwrite,
+            this.menuDeleteReadOnly,
             this.toolStripSeparator9,
             this.menuAutoselectFiles});
             this.filtersToolStripMenuItem.Name = "filtersToolStripMenuItem";
@@ -483,6 +485,15 @@
             this.menuAllowOverwrite.Text = "Allow Overwrite";
             this.menuAllowOverwrite.ToolTipText = "Overwrite files in destination when  copying or moving";
             this.menuAllowOverwrite.CheckedChanged += new System.EventHandler(this.menuAllowOverwrite_CheckedChanged);
+            // 
+            // menuDeleteReadOnly
+            // 
+            this.menuDeleteReadOnly.CheckOnClick = true;
+            this.menuDeleteReadOnly.Name = "menuDeleteReadOnly";
+            this.menuDeleteReadOnly.Size = new System.Drawing.Size(268, 22);
+            this.menuDeleteReadOnly.Text = "Allow Read-Only File Deletion";
+            this.menuDeleteReadOnly.ToolTipText = "Allow read-only files to be deleted or overwritten";
+            this.menuDeleteReadOnly.CheckedChanged += new System.EventHandler(this.menuDeleteReadOnly_CheckedChanged);
             // 
             // toolStripSeparator9
             // 
@@ -773,6 +784,7 @@
         private System.Windows.Forms.ToolStripMenuItem menuAutoselectFiles;
         private System.Windows.Forms.ToolStripMenuItem menuSelectAllInSelected;
         private System.Windows.Forms.ToolStripMenuItem menuFlatten;
+        private System.Windows.Forms.ToolStripMenuItem menuDeleteReadOnly;
     }
 }
 
