@@ -386,6 +386,12 @@ namespace SmartCopyTool
             get { return ( file.Attributes & FileAttributes.Hidden ) != 0; }
         }
 
+        public bool ReadOnly
+        {
+            get { return file.IsReadOnly; }
+            set { file.IsReadOnly = false; }
+        }
+
         public string Notes;
 
         public string Name { get { return file.Name; } }

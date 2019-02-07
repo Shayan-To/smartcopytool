@@ -67,6 +67,10 @@ Allow overwrite
 ---------------
 Copy and move operations will not overwrite files in the target directory by default.  Check this option if you would like files from the source to be copied and moved even when this will overwrite files in the target.
 
+Allow read-only file deletion
+---------------
+When deleting files, read-only files will be deleted.  When copying or moving files, read-only files at the destination will be overwritten.
+
 Autoselect Files on Restore
 ---------------------------
 
