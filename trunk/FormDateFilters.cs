@@ -11,14 +11,20 @@ namespace SmartCopyTool
 {
     public partial class FormDateFilters : Form
     {
-        public DateTime? FilterIfOlder { get; set; }
+        DateRemover.DateRanges DateRanges { get; set; }
 
-        public DateTime? FilterIfNewer { get; set; }
+        public DateTime? FilterIfOlder => DateRanges.FilterIfOlderThan;
 
-        public FormDateFilters(DateTime? dtFilterIfOlder, DateTime? dtFilterIfNewer)
+        public DateTime? FilterIfNewer => DateRanges.FilterIfNewerThan;
+
+        public DateTime? FilterIfModifiedBefore => DateRanges.FilterIfModifiedBefore;
+
+        public DateTime? FilterIfModifiedSince => DateRanges.FilterIfModifiedSince;
+
+        internal FormDateFilters(DateRemover.DateRanges dateRanges)
         {
-            FilterIfOlder = dtFilterIfOlder;
-            FilterIfNewer = dtFilterIfNewer;
+            DateRanges = dateRanges;
+
             InitializeComponent();
 
             if (FilterIfOlder.HasValue)
@@ -34,31 +40,39 @@ namespace SmartCopyTool
                 dateTimePickerNewer.Enabled = true;
                 cbFilterIfNewer.Checked = true;
             }
+
+            if (FilterIfModifiedBefore.HasValue)
+            {
+                dateTimePickerModifiedBefore.Value = FilterIfModifiedBefore.Value;
+                dateTimePickerModifiedBefore.Enabled = true;
+                cbFilterIfModifiedBefore.Checked = true;
+            }
+
+            if (FilterIfModifiedSince.HasValue)
+            {
+                dateTimePickerModifiedSince.Value = FilterIfModifiedSince.Value;
+                dateTimePickerModifiedSince.Enabled = true;
+                cbFilterIfModifiedSince.Checked = true;
+            }
         }
 
         private void buttonSetDateFilters_Click(object sender, EventArgs e)
         {
-            if (dateTimePickerOlder.Enabled)
+            DateRanges = new DateRemover.DateRanges()
             {
-                FilterIfOlder = dateTimePickerOlder.Value;
-            }
-            else
-            {
-                FilterIfOlder = null;
-            }
+                FilterIfOlderThan = dateTimePickerOlder.Enabled ? dateTimePickerOlder.Value as DateTime? : null,
+                FilterIfNewerThan = dateTimePickerNewer.Enabled ? dateTimePickerNewer.Value as DateTime? : null,
+                FilterIfModifiedBefore = dateTimePickerModifiedBefore.Enabled ? dateTimePickerModifiedBefore.Value as DateTime? : null,
+                FilterIfModifiedSince = dateTimePickerModifiedSince.Enabled ? dateTimePickerModifiedSince.Value as DateTime? : null
+            };
 
-            if (dateTimePickerNewer.Enabled)
-            {
-                FilterIfNewer = dateTimePickerNewer.Value;
-            }
-            else
-            {
-                FilterIfNewer = null;
-            }
-
-            Console.WriteLine("Filtering files not between dates {0} and {1}", 
+            Console.WriteLine("Filtering files not created between dates {0} and {1}", 
                 FilterIfOlder != null ? FilterIfOlder.ToString() : "any", 
                 FilterIfNewer != null ? FilterIfNewer.ToString() : "any");
+
+            Console.WriteLine("Filtering files not modified between dates {0} and {1}",
+                FilterIfModifiedBefore != null ? FilterIfModifiedBefore.ToString() : "any",
+                FilterIfModifiedSince != null ? FilterIfModifiedSince.ToString() : "any");
         }
 
         private void cbFilterIfOlder_CheckedChanged(object sender, EventArgs e)
@@ -69,6 +83,16 @@ namespace SmartCopyTool
         private void cbFilterIfNewer_CheckedChanged(object sender, EventArgs e)
         {
             dateTimePickerNewer.Enabled = cbFilterIfNewer.Checked;
+        }
+
+        private void cbFilterIfModifiedBefore_CheckedChanged(object sender, EventArgs e)
+        {
+            dateTimePickerModifiedBefore.Enabled = cbFilterIfModifiedBefore.Checked;
+        }
+
+        private void cbFilterIfModifiedSince_CheckedChanged(object sender, EventArgs e)
+        {
+            dateTimePickerModifiedSince.Enabled = cbFilterIfModifiedSince.Checked;
         }
     }
 }

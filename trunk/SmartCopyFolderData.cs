@@ -399,6 +399,7 @@ namespace SmartCopyTool
         public long Length { get { return file.Length; } }
         public FileAttributes Attributes { get { return file.Attributes; } }
         public DateTime CreationTime { get { return file.CreationTime; } }
+        public DateTime ModifiedTime { get { return file.LastWriteTime; } }
         public string DirectoryName { get { return file.DirectoryName; } }
 
         public override string ToString() { return file.ToString(); }

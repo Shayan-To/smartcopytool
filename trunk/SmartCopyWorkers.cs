@@ -951,23 +951,35 @@ namespace SmartCopyTool
 
         private int numNodes = 0;
         private int numProcessed = 0;
+        public struct DateRanges
+        {
+            public DateTime? FilterIfOlderThan { get; set; }
+            public DateTime? FilterIfNewerThan { get; set; }
+            public DateTime? FilterIfModifiedBefore { get; set; }
+            public DateTime? FilterIfModifiedSince { get; set; }
+        }
 
-        DateTime? FilterIfOlderThan { get; set; }
-        DateTime? FilterIfNewerThan { get; set; }
+        private DateRanges ranges = new DateRanges();
 
-        public DateRemover(TreeView tree, Options options, DateTime? dtFilterIfOlderThan, DateTime? dtFilterIfNewerThan)
+        public DateRemover(TreeView tree, Options options, DateRanges ranges)
         {
             operationName = "Filtering by date";
-            operationText = String.Format("Filtering files older than {0} or newer than {1}",
-                dtFilterIfOlderThan != null ? dtFilterIfOlderThan.ToString() : "any",
-                dtFilterIfNewerThan != null ? dtFilterIfNewerThan.ToString() : "any");
+            string[] rangeText = {
+                ranges.FilterIfOlderThan.HasValue ? String.Format("older than {0}", ranges.FilterIfOlderThan.ToString()) : null,
+                ranges.FilterIfNewerThan.HasValue ? String.Format("newer than {0}", ranges.FilterIfNewerThan.ToString()) : null,
+                ranges.FilterIfModifiedBefore.HasValue ? String.Format("modified before {0}", ranges.FilterIfModifiedBefore.ToString()) : null,
+                ranges.FilterIfModifiedSince.HasValue ? String.Format("modified since {0}", ranges.FilterIfModifiedSince.ToString()) : null,
+            };
+
+            rangeText = rangeText.Where(x => !String.IsNullOrEmpty(x)).ToArray();
+
+            operationText = String.Format("Filtering files {0}", String.Join(", ", rangeText));
+
             canCancel = true;
             canPause = true;
             this.tree = tree;
             this.options = options;
-
-            FilterIfOlderThan = dtFilterIfOlderThan;
-            FilterIfNewerThan = dtFilterIfNewerThan;
+            this.ranges = ranges;
         }
 
         public override State DoWork()
@@ -979,7 +991,11 @@ namespace SmartCopyTool
             Debug.Assert(src != null);
 
             // Anything to filter?
-            if (FilterIfOlderThan.HasValue == false && FilterIfNewerThan.HasValue == false)
+            if (ranges.FilterIfOlderThan.HasValue == false 
+                && ranges.FilterIfNewerThan.HasValue == false
+                && ranges.FilterIfModifiedBefore.HasValue == false
+                && ranges.FilterIfModifiedSince.HasValue == false
+                )
             {
                 return State.ERROR;
             }
@@ -1042,15 +1058,25 @@ namespace SmartCopyTool
                 if (CancellationPending)
                     return false;
 
-                if (FilterIfOlderThan.HasValue && file.CreationTime.Date < FilterIfOlderThan.Value)
+                if (ranges.FilterIfOlderThan.HasValue && file.CreationTime.Date < ranges.FilterIfOlderThan.Value)
                 {
                     file.Removed = true;
-                    file.Notes = String.Format("Older than {0}", FilterIfOlderThan.Value);
+                    file.Notes = String.Format("Older than {0}", ranges.FilterIfOlderThan.Value);
                 }
-                else if (FilterIfNewerThan.HasValue && file.CreationTime.Date > FilterIfNewerThan.Value)
+                else if (ranges.FilterIfNewerThan.HasValue && file.CreationTime.Date > ranges.FilterIfNewerThan.Value)
                 {
                     file.Removed = true;
-                    file.Notes = String.Format("Newer than {0}", FilterIfNewerThan.Value);
+                    file.Notes = String.Format("Newer than {0}", ranges.FilterIfNewerThan.Value);
+                }
+                else if (ranges.FilterIfModifiedBefore.HasValue && file.ModifiedTime.Date < ranges.FilterIfModifiedBefore.Value)
+                {
+                    file.Removed = true;
+                    file.Notes = String.Format("Modified before {0}", ranges.FilterIfModifiedBefore.Value);
+                }
+                else if (ranges.FilterIfModifiedSince.HasValue && file.ModifiedTime.Date > ranges.FilterIfModifiedSince.Value)
+                {
+                    file.Removed = true;
+                    file.Notes = String.Format("Modified since {0}", ranges.FilterIfModifiedSince.Value);
                 }
                 else if (!file.Filtered && !file.Removed)
                 {
