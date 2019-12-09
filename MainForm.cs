@@ -50,7 +50,7 @@ using System.Text.RegularExpressions;
 /// TODO:  Localization?
 namespace SmartCopyTool
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
         private Log myLog = new Log();
         private FormProgressDialog myProgress = null;
@@ -71,7 +71,7 @@ namespace SmartCopyTool
         /// Application Initialisation.
         /// Set start directory and build folder tree
         /// </summary>
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
 
@@ -267,7 +267,14 @@ namespace SmartCopyTool
                     if ( file.Filtered && myOptions.showFilteredFiles == false )
                         continue;
 
-                    string[] columns = new string[] { file.Name, HumanReadable.Size( file.Length ), file.CreationTime.ToString(), file.Notes == null ? "" : file.Notes };
+                    string[] columns = new string[] { 
+                        file.Name, 
+                        HumanReadable.Size( file.Length ), 
+                        file.CreationTime.ToString(), 
+                        file.ModifiedTime.ToString(), 
+                        file.Notes ?? "" 
+                    };
+
                     ListViewItem item = new ListViewItem( columns );
                     item.Tag = file;
                     item.Checked = file.Checked;
@@ -1012,21 +1019,42 @@ namespace SmartCopyTool
         /// <param name="e"></param>
         private void menuFilterByDate_Click(object sender, EventArgs e)
         {
-            using (FormDateFilters formDateFilters = new FormDateFilters(myOptions.FilterIfOlder, myOptions.FilterIfNewer))
+            DateRemover.DateRanges ranges = new DateRemover.DateRanges()
+            {
+                FilterIfOlderThan = myOptions.FilterIfOlder,
+                FilterIfNewerThan = myOptions.FilterIfNewer,
+                FilterIfModifiedBefore = myOptions.FilterIfModifiedBefore,
+                FilterIfModifiedSince = myOptions.FilterIfModifiedSince
+            };
+
+            using (FormDateFilters formDateFilters = new FormDateFilters(ranges))
             {
                 if (formDateFilters.ShowDialog() == DialogResult.OK)
                 {
                     myOptions.FilterIfOlder = formDateFilters.FilterIfOlder;
                     myOptions.FilterIfNewer = formDateFilters.FilterIfNewer;
+                    myOptions.FilterIfModifiedBefore = formDateFilters.FilterIfModifiedBefore;
+                    myOptions.FilterIfModifiedSince = formDateFilters.FilterIfModifiedSince;
 
-                    if (myOptions.FilterIfOlder.HasValue == false && myOptions.FilterIfNewer.HasValue == false)
+                    if (!myOptions.FilterIfOlder.HasValue 
+                        && !myOptions.FilterIfNewer.HasValue 
+                        && !myOptions.FilterIfModifiedBefore.HasValue 
+                        && !myOptions.FilterIfModifiedSince.HasValue)
                     {
                         MessageBox.Show("No date filters selected, nothing to filter!", "Cannot comply", MessageBoxButtons.OK);
                         return;
                     }
 
                     bool bRunInBackground = false;
-                    DateRemover myDateRemover = new DateRemover(directoryTree, myOptions, myOptions.FilterIfOlder, myOptions.FilterIfNewer);
+                    DateRemover.DateRanges dateRanges = new DateRemover.DateRanges()
+                    {
+                        FilterIfOlderThan = myOptions.FilterIfOlder,
+                        FilterIfNewerThan = myOptions.FilterIfNewer,
+                        FilterIfModifiedBefore = myOptions.FilterIfModifiedBefore,
+                        FilterIfModifiedSince = myOptions.FilterIfModifiedSince
+                    };
+
+                    DateRemover myDateRemover = new DateRemover(directoryTree, myOptions, dateRanges);
                     if (bRunInBackground)
                     {
                         PerformBackgroundOperation(myDateRemover);
@@ -1548,6 +1576,11 @@ namespace SmartCopyTool
 
             myWorker = worker;
 
+            if (!String.IsNullOrWhiteSpace(worker.operationText))
+            {
+                myLog.Write("{0}", worker.operationText);
+            }
+
             backgroundWorker1.RunWorkerAsync( worker );
 
             using (myProgress = new FormProgressDialog(worker))
@@ -1992,7 +2025,8 @@ namespace SmartCopyTool
         public SortOrder SortOrder = SortOrder.Ascending;
         public DateTime? FilterIfOlder = null;
         public DateTime? FilterIfNewer = null;
-
+        public DateTime? FilterIfModifiedBefore = null;
+        public DateTime? FilterIfModifiedSince = null;
 
         public Options() { }
 

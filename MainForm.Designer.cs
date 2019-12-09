@@ -1,6 +1,6 @@
 ﻿namespace SmartCopyTool
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.label1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusMenu = new System.Windows.Forms.ToolStripDropDownButton();
@@ -96,6 +96,7 @@
             this.folderBrowserDialog2 = new System.Windows.Forms.FolderBrowserDialog();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.columnModified = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -111,21 +112,23 @@
             // 
             // statusStrip1
             // 
+            this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.label1,
             this.statusMenu,
             this.label2,
             this.toolStripProgressBar1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 540);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 666);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(784, 22);
+            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 19, 0);
+            this.statusStrip1.Size = new System.Drawing.Size(1045, 26);
             this.statusStrip1.TabIndex = 1;
             this.statusStrip1.Text = "statusStrip1";
             // 
             // label1
             // 
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(95, 17);
+            this.label1.Size = new System.Drawing.Size(119, 20);
             this.label1.Text = "Smart Copy Tool";
             // 
             // statusMenu
@@ -137,44 +140,45 @@
             this.statusMenu.Image = ((System.Drawing.Image)(resources.GetObject("statusMenu.Image")));
             this.statusMenu.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.statusMenu.Name = "statusMenu";
-            this.statusMenu.Size = new System.Drawing.Size(44, 20);
+            this.statusMenu.Size = new System.Drawing.Size(54, 24);
             this.statusMenu.Text = "Stop";
             // 
             // statusMenuAbort
             // 
             this.statusMenuAbort.Name = "statusMenuAbort";
-            this.statusMenuAbort.Size = new System.Drawing.Size(105, 22);
+            this.statusMenuAbort.Size = new System.Drawing.Size(130, 26);
             this.statusMenuAbort.Text = "Abort";
             this.statusMenuAbort.Click += new System.EventHandler(this.statusMenuAbort_Click);
             // 
             // statusMenuPause
             // 
             this.statusMenuPause.Name = "statusMenuPause";
-            this.statusMenuPause.Size = new System.Drawing.Size(105, 22);
+            this.statusMenuPause.Size = new System.Drawing.Size(130, 26);
             this.statusMenuPause.Text = "Pause";
             this.statusMenuPause.Click += new System.EventHandler(this.statusMenuPause_Click);
             // 
             // label2
             // 
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(64, 17);
+            this.label2.Size = new System.Drawing.Size(80, 20);
             this.label2.Text = "Hey There!";
             // 
             // toolStripProgressBar1
             // 
             this.toolStripProgressBar1.Name = "toolStripProgressBar1";
-            this.toolStripProgressBar1.Size = new System.Drawing.Size(100, 16);
+            this.toolStripProgressBar1.Size = new System.Drawing.Size(133, 18);
             this.toolStripProgressBar1.Visible = false;
             // 
             // menuStrip1
             // 
+            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileMenu,
             this.filtersToolStripMenuItem,
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(784, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1045, 28);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -207,14 +211,14 @@
             this.toolStripSeparator6,
             this.menuExit});
             this.fileMenu.Name = "fileMenu";
-            this.fileMenu.Size = new System.Drawing.Size(37, 20);
+            this.fileMenu.Size = new System.Drawing.Size(46, 24);
             this.fileMenu.Text = "File";
             // 
             // menuCopy
             // 
             this.menuCopy.Name = "menuCopy";
             this.menuCopy.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.menuCopy.Size = new System.Drawing.Size(293, 22);
+            this.menuCopy.Size = new System.Drawing.Size(367, 26);
             this.menuCopy.Text = "&Copy Selected Files";
             this.menuCopy.ToolTipText = "Copy selected folders to a target directory";
             this.menuCopy.Click += new System.EventHandler(this.menuCopy_Click);
@@ -223,7 +227,7 @@
             // 
             this.menuMove.Name = "menuMove";
             this.menuMove.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.M)));
-            this.menuMove.Size = new System.Drawing.Size(293, 22);
+            this.menuMove.Size = new System.Drawing.Size(367, 26);
             this.menuMove.Text = "&Move Selected Files";
             this.menuMove.ToolTipText = "Move selected files and folders to a target directory";
             this.menuMove.Click += new System.EventHandler(this.menuMove_Click);
@@ -233,20 +237,20 @@
             this.menuFlatten.Name = "menuFlatten";
             this.menuFlatten.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.F)));
-            this.menuFlatten.Size = new System.Drawing.Size(293, 22);
+            this.menuFlatten.Size = new System.Drawing.Size(367, 26);
             this.menuFlatten.Text = "&Flatten Selected Files";
             this.menuFlatten.Click += new System.EventHandler(this.menuFlatten_Click);
             // 
             // toolStripSeparator8
             // 
             this.toolStripSeparator8.Name = "toolStripSeparator8";
-            this.toolStripSeparator8.Size = new System.Drawing.Size(290, 6);
+            this.toolStripSeparator8.Size = new System.Drawing.Size(364, 6);
             // 
             // menuChangeSourceFolder
             // 
             this.menuChangeSourceFolder.Name = "menuChangeSourceFolder";
             this.menuChangeSourceFolder.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
-            this.menuChangeSourceFolder.Size = new System.Drawing.Size(293, 22);
+            this.menuChangeSourceFolder.Size = new System.Drawing.Size(367, 26);
             this.menuChangeSourceFolder.Text = "Change Source &Folder";
             this.menuChangeSourceFolder.ToolTipText = "Select a new source folder";
             this.menuChangeSourceFolder.Click += new System.EventHandler(this.menuChangeSourceFolder_Click);
@@ -256,7 +260,7 @@
             this.menuRescan.Name = "menuRescan";
             this.menuRescan.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.D)));
-            this.menuRescan.Size = new System.Drawing.Size(293, 22);
+            this.menuRescan.Size = new System.Drawing.Size(367, 26);
             this.menuRescan.Text = "Re&scan";
             this.menuRescan.ToolTipText = "Rescan the current directory structure";
             this.menuRescan.Click += new System.EventHandler(this.menuRescan_Click);
@@ -264,12 +268,12 @@
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(290, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(364, 6);
             // 
             // menuRemoveMirrored
             // 
             this.menuRemoveMirrored.Name = "menuRemoveMirrored";
-            this.menuRemoveMirrored.Size = new System.Drawing.Size(293, 22);
+            this.menuRemoveMirrored.Size = new System.Drawing.Size(367, 26);
             this.menuRemoveMirrored.Text = "Filter Mirrored Paths";
             this.menuRemoveMirrored.ToolTipText = "Remove files and folders from the list if they exist in a target directory";
             this.menuRemoveMirrored.Click += new System.EventHandler(this.menuFilterMirrored_Click);
@@ -277,7 +281,7 @@
             // menuRemoveUnmirrored
             // 
             this.menuRemoveUnmirrored.Name = "menuRemoveUnmirrored";
-            this.menuRemoveUnmirrored.Size = new System.Drawing.Size(293, 22);
+            this.menuRemoveUnmirrored.Size = new System.Drawing.Size(367, 26);
             this.menuRemoveUnmirrored.Text = "Filter Unmirrored Paths";
             this.menuRemoveUnmirrored.ToolTipText = "Remove files and folders from the list if they do not exist in a target directory" +
     "";
@@ -286,19 +290,19 @@
             // menuFilterByDate
             // 
             this.menuFilterByDate.Name = "menuFilterByDate";
-            this.menuFilterByDate.Size = new System.Drawing.Size(293, 22);
+            this.menuFilterByDate.Size = new System.Drawing.Size(367, 26);
             this.menuFilterByDate.Text = "Filter By Date";
             this.menuFilterByDate.Click += new System.EventHandler(this.menuFilterByDate_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(290, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(364, 6);
             // 
             // menuDeleteFiles
             // 
             this.menuDeleteFiles.Name = "menuDeleteFiles";
-            this.menuDeleteFiles.Size = new System.Drawing.Size(293, 22);
+            this.menuDeleteFiles.Size = new System.Drawing.Size(367, 26);
             this.menuDeleteFiles.Text = "Delete Selected Files";
             this.menuDeleteFiles.ToolTipText = "Delete selected files from source directory";
             this.menuDeleteFiles.Click += new System.EventHandler(this.menuDeleteFiles_Click);
@@ -306,12 +310,12 @@
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(290, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(364, 6);
             // 
             // menuFindOrphans
             // 
             this.menuFindOrphans.Name = "menuFindOrphans";
-            this.menuFindOrphans.Size = new System.Drawing.Size(293, 22);
+            this.menuFindOrphans.Size = new System.Drawing.Size(367, 26);
             this.menuFindOrphans.Text = "Find Orphans";
             this.menuFindOrphans.ToolTipText = "Find files in target directory which do not exist in current directory.  Changes " +
     "current directory.";
@@ -320,7 +324,7 @@
             // menuUpdateDirectory
             // 
             this.menuUpdateDirectory.Name = "menuUpdateDirectory";
-            this.menuUpdateDirectory.Size = new System.Drawing.Size(293, 22);
+            this.menuUpdateDirectory.Size = new System.Drawing.Size(367, 26);
             this.menuUpdateDirectory.Text = "Update Directory";
             this.menuUpdateDirectory.ToolTipText = "Copy any files and folders in the source to the target if they are not already pr" +
     "esent.";
@@ -329,7 +333,7 @@
             // menuSynchroniseDirectory
             // 
             this.menuSynchroniseDirectory.Name = "menuSynchroniseDirectory";
-            this.menuSynchroniseDirectory.Size = new System.Drawing.Size(293, 22);
+            this.menuSynchroniseDirectory.Size = new System.Drawing.Size(367, 26);
             this.menuSynchroniseDirectory.Text = "Synchronise Directory";
             this.menuSynchroniseDirectory.ToolTipText = "Synchronise target directory with current directory tree.  Any files in target no" +
     "t in source will be deleted!";
@@ -338,7 +342,7 @@
             // menuMergeDirectories
             // 
             this.menuMergeDirectories.Name = "menuMergeDirectories";
-            this.menuMergeDirectories.Size = new System.Drawing.Size(293, 22);
+            this.menuMergeDirectories.Size = new System.Drawing.Size(367, 26);
             this.menuMergeDirectories.Text = "Merge Directories";
             this.menuMergeDirectories.ToolTipText = "Merge this directory with another.  Any files not in either directory will be cop" +
     "ied to the other.";
@@ -347,13 +351,13 @@
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(290, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(364, 6);
             // 
             // menuSaveSelection
             // 
             this.menuSaveSelection.Name = "menuSaveSelection";
             this.menuSaveSelection.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.menuSaveSelection.Size = new System.Drawing.Size(293, 22);
+            this.menuSaveSelection.Size = new System.Drawing.Size(367, 26);
             this.menuSaveSelection.Text = "Save Selection To Text File";
             this.menuSaveSelection.ToolTipText = "Save selected files and folders to a text file or playlist";
             this.menuSaveSelection.Click += new System.EventHandler(this.menuSaveSelection_Click);
@@ -362,7 +366,7 @@
             // 
             this.menuRestoreSelection.Name = "menuRestoreSelection";
             this.menuRestoreSelection.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
-            this.menuRestoreSelection.Size = new System.Drawing.Size(293, 22);
+            this.menuRestoreSelection.Size = new System.Drawing.Size(367, 26);
             this.menuRestoreSelection.Text = "Restore Selection From File";
             this.menuRestoreSelection.ToolTipText = "Select files and folders from a saved selection file";
             this.menuRestoreSelection.Click += new System.EventHandler(this.menuRestoreSelection_Click);
@@ -373,7 +377,7 @@
             this.menuRemoveSelection.ShortcutKeyDisplayString = "Ctrl+Shift+R";
             this.menuRemoveSelection.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.R)));
-            this.menuRemoveSelection.Size = new System.Drawing.Size(293, 22);
+            this.menuRemoveSelection.Size = new System.Drawing.Size(367, 26);
             this.menuRemoveSelection.Text = "Remove Selection From File";
             this.menuRemoveSelection.ToolTipText = "Deselect files and folders from a saved selection file";
             this.menuRemoveSelection.Click += new System.EventHandler(this.menuRemoveSelection_Click);
@@ -381,27 +385,27 @@
             // menuExpandSelectedFolders
             // 
             this.menuExpandSelectedFolders.Name = "menuExpandSelectedFolders";
-            this.menuExpandSelectedFolders.Size = new System.Drawing.Size(293, 22);
+            this.menuExpandSelectedFolders.Size = new System.Drawing.Size(367, 26);
             this.menuExpandSelectedFolders.Text = "Expand Selected Folders";
             this.menuExpandSelectedFolders.Click += new System.EventHandler(this.menuExpandSelectedFolders_Click);
             // 
             // menuSelectAllInSelected
             // 
             this.menuSelectAllInSelected.Name = "menuSelectAllInSelected";
-            this.menuSelectAllInSelected.Size = new System.Drawing.Size(293, 22);
+            this.menuSelectAllInSelected.Size = new System.Drawing.Size(367, 26);
             this.menuSelectAllInSelected.Text = "Select All Files In Selected Folders";
             this.menuSelectAllInSelected.Click += new System.EventHandler(this.menuSelectAllInSelected_Click);
             // 
             // toolStripSeparator6
             // 
             this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(290, 6);
+            this.toolStripSeparator6.Size = new System.Drawing.Size(364, 6);
             // 
             // menuExit
             // 
             this.menuExit.Name = "menuExit";
             this.menuExit.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Q)));
-            this.menuExit.Size = new System.Drawing.Size(293, 22);
+            this.menuExit.Size = new System.Drawing.Size(367, 26);
             this.menuExit.Text = "E&xit";
             this.menuExit.Click += new System.EventHandler(this.menuExit_Click);
             // 
@@ -420,20 +424,20 @@
             this.toolStripSeparator9,
             this.menuAutoselectFiles});
             this.filtersToolStripMenuItem.Name = "filtersToolStripMenuItem";
-            this.filtersToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.filtersToolStripMenuItem.Size = new System.Drawing.Size(75, 24);
             this.filtersToolStripMenuItem.Text = "Options";
             // 
             // menuSetFilters
             // 
             this.menuSetFilters.Name = "menuSetFilters";
-            this.menuSetFilters.Size = new System.Drawing.Size(268, 22);
+            this.menuSetFilters.Size = new System.Drawing.Size(337, 26);
             this.menuSetFilters.Text = "Set Filename Filters";
             this.menuSetFilters.Click += new System.EventHandler(this.menuSetFilters_Click);
             // 
             // menuClearFilters
             // 
             this.menuClearFilters.Name = "menuClearFilters";
-            this.menuClearFilters.Size = new System.Drawing.Size(268, 22);
+            this.menuClearFilters.Size = new System.Drawing.Size(337, 26);
             this.menuClearFilters.Text = "Clear Filename Filters";
             this.menuClearFilters.Click += new System.EventHandler(this.menuClearFilters_Click);
             // 
@@ -441,20 +445,20 @@
             // 
             this.menuShowFilteredFiles.CheckOnClick = true;
             this.menuShowFilteredFiles.Name = "menuShowFilteredFiles";
-            this.menuShowFilteredFiles.Size = new System.Drawing.Size(268, 22);
+            this.menuShowFilteredFiles.Size = new System.Drawing.Size(337, 26);
             this.menuShowFilteredFiles.Text = "Show Filtered Files";
             this.menuShowFilteredFiles.CheckedChanged += new System.EventHandler(this.menuShowFilteredFiles_CheckedChanged);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(265, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(334, 6);
             // 
             // menuIncludeHidden
             // 
             this.menuIncludeHidden.CheckOnClick = true;
             this.menuIncludeHidden.Name = "menuIncludeHidden";
-            this.menuIncludeHidden.Size = new System.Drawing.Size(268, 22);
+            this.menuIncludeHidden.Size = new System.Drawing.Size(337, 26);
             this.menuIncludeHidden.Text = "Include Hidden Files";
             this.menuIncludeHidden.ToolTipText = "Include hidden files in copy/move/compare operations";
             this.menuIncludeHidden.CheckedChanged += new System.EventHandler(this.menuIncludeHidden_CheckedChanged);
@@ -463,7 +467,7 @@
             // 
             this.menuIgnoreSize.CheckOnClick = true;
             this.menuIgnoreSize.Name = "menuIgnoreSize";
-            this.menuIgnoreSize.Size = new System.Drawing.Size(268, 22);
+            this.menuIgnoreSize.Size = new System.Drawing.Size(337, 26);
             this.menuIgnoreSize.Text = "Ignore Size";
             this.menuIgnoreSize.ToolTipText = "Ignore file sizes when checking for mirrored or unmirrored files and folders";
             this.menuIgnoreSize.CheckedChanged += new System.EventHandler(this.menuIgnoreSize_CheckedChanged);
@@ -472,7 +476,7 @@
             // 
             this.menuIgnoreExtension.CheckOnClick = true;
             this.menuIgnoreExtension.Name = "menuIgnoreExtension";
-            this.menuIgnoreExtension.Size = new System.Drawing.Size(268, 22);
+            this.menuIgnoreExtension.Size = new System.Drawing.Size(337, 26);
             this.menuIgnoreExtension.Text = "Ignore Extension";
             this.menuIgnoreExtension.ToolTipText = "Ignore file extensions when checked";
             this.menuIgnoreExtension.CheckedChanged += new System.EventHandler(this.menuIgnoreExtension_CheckedChanged);
@@ -481,7 +485,7 @@
             // 
             this.menuAllowOverwrite.CheckOnClick = true;
             this.menuAllowOverwrite.Name = "menuAllowOverwrite";
-            this.menuAllowOverwrite.Size = new System.Drawing.Size(268, 22);
+            this.menuAllowOverwrite.Size = new System.Drawing.Size(337, 26);
             this.menuAllowOverwrite.Text = "Allow Overwrite";
             this.menuAllowOverwrite.ToolTipText = "Overwrite files in destination when  copying or moving";
             this.menuAllowOverwrite.CheckedChanged += new System.EventHandler(this.menuAllowOverwrite_CheckedChanged);
@@ -490,7 +494,7 @@
             // 
             this.menuDeleteReadOnly.CheckOnClick = true;
             this.menuDeleteReadOnly.Name = "menuDeleteReadOnly";
-            this.menuDeleteReadOnly.Size = new System.Drawing.Size(268, 22);
+            this.menuDeleteReadOnly.Size = new System.Drawing.Size(337, 26);
             this.menuDeleteReadOnly.Text = "Allow Read-Only File Deletion";
             this.menuDeleteReadOnly.ToolTipText = "Allow read-only files to be deleted or overwritten";
             this.menuDeleteReadOnly.CheckedChanged += new System.EventHandler(this.menuDeleteReadOnly_CheckedChanged);
@@ -498,13 +502,13 @@
             // toolStripSeparator9
             // 
             this.toolStripSeparator9.Name = "toolStripSeparator9";
-            this.toolStripSeparator9.Size = new System.Drawing.Size(265, 6);
+            this.toolStripSeparator9.Size = new System.Drawing.Size(334, 6);
             // 
             // menuAutoselectFiles
             // 
             this.menuAutoselectFiles.CheckOnClick = true;
             this.menuAutoselectFiles.Name = "menuAutoselectFiles";
-            this.menuAutoselectFiles.Size = new System.Drawing.Size(268, 22);
+            this.menuAutoselectFiles.Size = new System.Drawing.Size(337, 26);
             this.menuAutoselectFiles.Text = "Autoselect Files On Selection Restore";
             this.menuAutoselectFiles.ToolTipText = "When restoring selections from file, autoselect files in selected folders";
             this.menuAutoselectFiles.CheckedChanged += new System.EventHandler(this.menuAutoselectFiles_CheckedChanged);
@@ -514,13 +518,13 @@
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.aboutThisSoftwareToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(55, 24);
             this.helpToolStripMenuItem.Text = "Help";
             // 
             // aboutThisSoftwareToolStripMenuItem
             // 
             this.aboutThisSoftwareToolStripMenuItem.Name = "aboutThisSoftwareToolStripMenuItem";
-            this.aboutThisSoftwareToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.aboutThisSoftwareToolStripMenuItem.Size = new System.Drawing.Size(226, 26);
             this.aboutThisSoftwareToolStripMenuItem.Text = "About This Software";
             this.aboutThisSoftwareToolStripMenuItem.Click += new System.EventHandler(this.aboutThisSoftwareToolStripMenuItem_Click);
             // 
@@ -530,8 +534,9 @@
             this.directoryTree.Dock = System.Windows.Forms.DockStyle.Fill;
             this.directoryTree.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.directoryTree.Location = new System.Drawing.Point(0, 0);
+            this.directoryTree.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.directoryTree.Name = "directoryTree";
-            this.directoryTree.Size = new System.Drawing.Size(261, 516);
+            this.directoryTree.Size = new System.Drawing.Size(347, 638);
             this.directoryTree.TabIndex = 0;
             this.directoryTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.directoryTree_AfterCheck);
             this.directoryTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treenode_Selected);
@@ -540,7 +545,8 @@
             // splitContainer1
             // 
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 24);
+            this.splitContainer1.Location = new System.Drawing.Point(0, 28);
+            this.splitContainer1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -550,14 +556,16 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
-            this.splitContainer1.Size = new System.Drawing.Size(784, 516);
-            this.splitContainer1.SplitterDistance = 261;
+            this.splitContainer1.Size = new System.Drawing.Size(1045, 638);
+            this.splitContainer1.SplitterDistance = 347;
+            this.splitContainer1.SplitterWidth = 5;
             this.splitContainer1.TabIndex = 3;
             // 
             // splitContainer2
             // 
             this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer2.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.splitContainer2.Name = "splitContainer2";
             this.splitContainer2.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
@@ -568,8 +576,9 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.textBox1);
-            this.splitContainer2.Size = new System.Drawing.Size(519, 516);
-            this.splitContainer2.SplitterDistance = 350;
+            this.splitContainer2.Size = new System.Drawing.Size(693, 638);
+            this.splitContainer2.SplitterDistance = 432;
+            this.splitContainer2.SplitterWidth = 5;
             this.splitContainer2.TabIndex = 0;
             // 
             // fileListView
@@ -579,13 +588,16 @@
             this.columnFilename,
             this.columnSize,
             this.columnDate,
+            this.columnModified,
             this.columnNotes});
             this.fileListView.ContextMenuStrip = this.fileContextMenu;
             this.fileListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.fileListView.FullRowSelect = true;
+            this.fileListView.HideSelection = false;
             this.fileListView.Location = new System.Drawing.Point(0, 0);
+            this.fileListView.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.fileListView.Name = "fileListView";
-            this.fileListView.Size = new System.Drawing.Size(519, 350);
+            this.fileListView.Size = new System.Drawing.Size(693, 432);
             this.fileListView.TabIndex = 0;
             this.fileListView.UseCompatibleStateImageBehavior = false;
             this.fileListView.View = System.Windows.Forms.View.Details;
@@ -610,10 +622,11 @@
             // columnNotes
             // 
             this.columnNotes.Text = "Notes";
-            this.columnNotes.Width = 77;
+            this.columnNotes.Width = 100;
             // 
             // fileContextMenu
             // 
+            this.fileContextMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.fileContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsmCheckSelectedFiles,
             this.tsmUncheckSelectedFiles,
@@ -621,32 +634,32 @@
             this.tsmSelectAllFiles});
             this.fileContextMenu.Name = "fileContextMenu";
             this.fileContextMenu.ShowItemToolTips = false;
-            this.fileContextMenu.Size = new System.Drawing.Size(194, 76);
+            this.fileContextMenu.Size = new System.Drawing.Size(228, 82);
             // 
             // tsmCheckSelectedFiles
             // 
             this.tsmCheckSelectedFiles.Name = "tsmCheckSelectedFiles";
-            this.tsmCheckSelectedFiles.Size = new System.Drawing.Size(193, 22);
+            this.tsmCheckSelectedFiles.Size = new System.Drawing.Size(227, 24);
             this.tsmCheckSelectedFiles.Text = "Check Selected Files";
             this.tsmCheckSelectedFiles.Click += new System.EventHandler(this.tsmCheckSelectedFiles_Click);
             // 
             // tsmUncheckSelectedFiles
             // 
             this.tsmUncheckSelectedFiles.Name = "tsmUncheckSelectedFiles";
-            this.tsmUncheckSelectedFiles.Size = new System.Drawing.Size(193, 22);
+            this.tsmUncheckSelectedFiles.Size = new System.Drawing.Size(227, 24);
             this.tsmUncheckSelectedFiles.Text = "Uncheck Selected Files";
             this.tsmUncheckSelectedFiles.Click += new System.EventHandler(this.tsmUncheckSelectedFiles_Click);
             // 
             // toolStripSeparator7
             // 
             this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(190, 6);
+            this.toolStripSeparator7.Size = new System.Drawing.Size(224, 6);
             // 
             // tsmSelectAllFiles
             // 
             this.tsmSelectAllFiles.Name = "tsmSelectAllFiles";
             this.tsmSelectAllFiles.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-            this.tsmSelectAllFiles.Size = new System.Drawing.Size(193, 22);
+            this.tsmSelectAllFiles.Size = new System.Drawing.Size(227, 24);
             this.tsmSelectAllFiles.Text = "Select All Files";
             this.tsmSelectAllFiles.Click += new System.EventHandler(this.tsmSelectAllFiles_Click);
             // 
@@ -655,11 +668,12 @@
             this.textBox1.BackColor = System.Drawing.SystemColors.Window;
             this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBox1.Location = new System.Drawing.Point(0, 0);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(519, 162);
+            this.textBox1.Size = new System.Drawing.Size(693, 201);
             this.textBox1.TabIndex = 0;
             // 
             // folderBrowserDialog1
@@ -686,14 +700,20 @@
             this.openFileDialog.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
             this.openFileDialog.Title = "Choose Filename";
             // 
+            // columnModified
+            // 
+            this.columnModified.Text = "Modified";
+            this.columnModified.Width = 87;
+            // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(784, 562);
+            this.ClientSize = new System.Drawing.Size(1045, 692);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip1);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "Form1";
             this.Text = "Smart Copy Tool";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
@@ -785,6 +805,7 @@
         private System.Windows.Forms.ToolStripMenuItem menuSelectAllInSelected;
         private System.Windows.Forms.ToolStripMenuItem menuFlatten;
         private System.Windows.Forms.ToolStripMenuItem menuDeleteReadOnly;
+        private System.Windows.Forms.ColumnHeader columnModified;
     }
 }
 
