@@ -40,6 +40,7 @@ namespace SmartCopyTool
         private Options statusBarOptions = null;        // The options that were set when status bar was last updated
 
         private long m_numCheckedFolders = -1;
+        private long m_numCheckedFiles = -1;
         private long m_checkedFoldersSize = -1;
 
         private string backgroundOperationName;
@@ -114,9 +115,9 @@ namespace SmartCopyTool
             }
             else
             {
-                if ( m_numCheckedFolders > 0 )
+                if ( m_numCheckedFolders > 0 || m_numCheckedFiles > 0)
                 {
-                    statusString += String.Format( "   Selected Folders: {0} ({1}) ", m_numCheckedFolders, HumanReadable.Size( m_checkedFoldersSize ) );
+                    statusString += String.Format("   Selected Folders: {0} ({2} in {1} files) ", m_numCheckedFolders, m_numCheckedFiles, HumanReadable.Size( m_checkedFoldersSize ) );
                 }
             }
 
@@ -223,6 +224,7 @@ namespace SmartCopyTool
                     if ( ScanRequest )
                     {
                         m_numCheckedFolders = 0;
+                        m_numCheckedFiles = 0;
                         m_checkedFoldersSize = 0;
                         UpdateDisplay();
 
@@ -259,6 +261,8 @@ namespace SmartCopyTool
                     m_numCheckedFolders++;
                     FolderData folder = (FolderData)node.Tag;
                     List<FileData> files = (List<FileData>)theTree.Invoke( delGetFiles, folder, options );
+
+                    m_numCheckedFiles += files.Count;
 
                     foreach ( FileData file in files )
                         m_checkedFoldersSize += file.Length;
